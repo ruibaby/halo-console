@@ -204,6 +204,7 @@ export default {
         return
       }
       try {
+        // TODO 修改 sdk 的方法为 updateName
         await apiClient.attachment.update(this.attachment.id, this.attachment)
       } catch (error) {
         this.$log.error(error)
