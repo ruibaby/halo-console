@@ -95,3 +95,48 @@ export const attachmentTypes = {
     text: 'MinIO'
   }
 }
+
+export const postStatuses = {
+  PUBLISHED: {
+    value: 'PUBLISHED',
+    color: 'green',
+    status: 'success',
+    text: '已发布'
+  },
+  DRAFT: {
+    value: 'DRAFT',
+    color: 'yellow',
+    status: 'warning',
+    text: '草稿'
+  },
+  RECYCLE: {
+    value: 'RECYCLE',
+    color: 'red',
+    status: 'error',
+    text: '回收站'
+  },
+  INTIMATE: {
+    value: 'INTIMATE',
+    color: 'blue',
+    status: 'success',
+    text: '私密'
+  }
+}
+
+export const sheetStatuses = {
+  PUBLISHED: {
+    color: 'green',
+    status: 'success',
+    text: '已发布'
+  },
+  DRAFT: {
+    color: 'yellow',
+    status: 'warning',
+    text: '草稿'
+  },
+  RECYCLE: {
+    color: 'red',
+    status: 'error',
+    text: '回收站'
+  }
+}
