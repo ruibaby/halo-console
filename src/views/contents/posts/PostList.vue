@@ -18,10 +18,12 @@ import {
   IconSettings,
 } from "@/core/icons";
 import { posts } from "./posts-mock";
-import { computed, ref } from "vue";
+import { computed, getCurrentInstance, markRaw, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
 import { users } from "@/views/system/users/users-mock";
+import { useExtensionPointsData } from "@/core/plugin/plugins";
+import type { PostsPagePublicState } from "@/views/contents/posts/interface";
 
 const postsRef = ref(
   // eslint-disable-next-line
@@ -34,7 +36,6 @@ const postsRef = ref(
 );
 
 const router = useRouter();
-const checkAll = ref(false);
 const postSettings = ref(false);
 const settingActiveId = ref("general");
 // eslint-disable-next-line
@@ -47,9 +48,11 @@ const checkedCount = computed(() => {
 
 const handleCheckAll = () => {
   postsRef.value.forEach((item) => {
-    item.checked = checkAll.value;
+    item.checked = state.checkAll;
   });
 };
+
+console.log(getCurrentInstance());
 
 // eslint-disable-next-line
 const handleSelect = (post: any) => {
@@ -80,6 +83,36 @@ const handleRouteToEditor = (post: any) => {
     },
   });
 };
+
+const state = reactive<PostsPagePublicState>({
+  actions: [
+    {
+      component: markRaw(VButton),
+      props: {
+        size: "sm",
+      },
+      slots: {
+        default: "回收站",
+        icon: IconDeleteBin,
+      },
+    },
+    {
+      component: markRaw(VButton),
+      props: {
+        type: "secondary",
+        route: { name: "PostEditor" },
+      },
+      slots: {
+        default: "新建",
+        icon: IconAddCircle,
+      },
+    },
+  ],
+  checkAll: false,
+  afterComponents: [],
+});
+
+useExtensionPointsData("POSTS", state);
 </script>
 <template>
   <VModal v-model:visible="postSettings" :width="680" title="文章设置">
@@ -310,18 +343,27 @@ const handleRouteToEditor = (post: any) => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm">
-          <template #icon>
-            <IconDeleteBin class="h-full w-full" />
-          </template>
-          回收站
-        </VButton>
-        <VButton :route="{ name: 'PostEditor' }" type="secondary">
-          <template #icon>
-            <IconAddCircle class="h-full w-full" />
-          </template>
-          新建
-        </VButton>
+        <!--        <VButton size="sm">-->
+        <!--          <template #icon>-->
+        <!--            <IconDeleteBin class="h-full w-full" />-->
+        <!--          </template>-->
+        <!--          回收站-->
+        <!--        </VButton>-->
+        <!--        <VButton :route="{ name: 'PostEditor' }" type="secondary">-->
+        <!--          <template #icon>-->
+        <!--            <IconAddCircle class="h-full w-full" />-->
+        <!--          </template>-->
+        <!--          新建-->
+        <!--        </VButton>-->
+        <component
+          :is="action.component"
+          v-for="(action, index) in state.actions"
+          :key="index"
+          v-bind="action.props"
+          v-on="action.events"
+        >
+          {{ action.slots.default }}
+        </component>
       </VSpace>
     </template>
   </VPageHeader>
@@ -335,7 +377,7 @@ const handleRouteToEditor = (post: any) => {
           >
             <div class="mr-4 hidden items-center sm:flex">
               <input
-                v-model="checkAll"
+                v-model="state.checkAll"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAll()"
@@ -673,4 +715,12 @@ const handleRouteToEditor = (post: any) => {
       </template>
     </VCard>
   </div>
+
+  <component
+    :is="component.component"
+    v-for="(component, index) in state.afterComponents"
+    :key="index"
+    v-bind="component.props"
+    v-on="component.events"
+  ></component>
 </template>

@@ -183,7 +183,6 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: ":username",
         component: UserProfileLayout,
-        alias: ["profile"],
         children: [
           {
             path: "detail",

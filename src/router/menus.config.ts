@@ -125,6 +125,18 @@ export const minimenus: MenuItemType[] = [
   },
 ];
 
+export function registerMenu(group: string, menu: MenuItemType) {
+  const groupIndex = menus.findIndex((g) => g.name === group);
+  if (groupIndex !== -1) {
+    menus[groupIndex].items.push(menu);
+    return;
+  }
+  menus.push({
+    name: group,
+    items: [menu],
+  });
+}
+
 export type { MenuItemType, MenuGroupType };
 
 export default menus;
