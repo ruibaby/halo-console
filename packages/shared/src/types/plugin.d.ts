@@ -1,11 +1,12 @@
 import type { Component } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import type { MenuGroupType } from "@/router/menus.config";
-import type { PostsPagePublicState } from "@/views/contents/posts/interface";
+import type { MenuGroupType } from "./menu";
+import type { PostsPagePublicState } from "./post";
+import type { DashboardPublicState } from "./dashboard";
 
-export type ExtensionPointType = "POSTS" | "POST_EDITOR";
+export type ExtensionPointType = "POSTS" | "POST_EDITOR" | "DASHBOARD";
 
-export type ExtensionPointState = PostsPagePublicState;
+export type ExtensionPointState = PostsPagePublicState | DashboardPublicState;
 
 export interface Plugin {
   name: string;
@@ -30,7 +31,7 @@ export interface Plugin {
   menus?: MenuGroupType[];
 
   extensionPoints: Record<
-    ExtensionPointType,
+    ?ExtensionPointType,
     (state: ExtensionPointState) => void
   >;
 }

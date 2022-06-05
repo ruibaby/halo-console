@@ -58,14 +58,17 @@
     <VTabbar
       v-model:active-id="activeId"
       :items="
-        widgetsGroup.map((group) => {
+        publicState.widgets.map((group) => {
           return { id: group.id, label: group.label };
         })
       "
       type="outline"
     ></VTabbar>
 
-    <template v-for="(group, groupIndex) in widgetsGroup" :key="groupIndex">
+    <template
+      v-for="(group, groupIndex) in publicState.widgets"
+      :key="groupIndex"
+    >
       <div v-if="activeId === group.id" class="mt-4">
         <VAlert
           v-if="group.notice"
@@ -116,51 +119,59 @@ import {
   IconSave,
   IconSettings,
 } from "@/core/icons";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
+import type { DashboardPublicState } from "@halo-dev/admin-shared/src/types";
+import { useExtensionPointsData } from "@/core/plugin/plugins";
 
 const settings = ref(false);
 const widgetsModal = ref(false);
 const activeId = ref("post");
 
-const widgetsGroup = [
-  {
-    id: "post",
-    label: "文章",
-    widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
-      { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
-    ],
-  },
-  {
-    id: "comment",
-    label: "评论",
-    widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "CommentStatsWidget" }],
-  },
-  {
-    id: "user",
-    label: "用户",
-    widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
-      { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentLoginWidget" },
-    ],
-  },
-  {
-    id: "plugin-journal",
-    label: "日志",
-    notice: "此组件由插件 plugin-journal 提供",
-    widgets: [{ x: 0, y: 0, w: 5, h: 8, i: 0, widget: "JournalPublishWidget" }],
-  },
-  {
-    id: "other",
-    label: "其他",
-    widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
-      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },
-    ],
-  },
-];
+const publicState = reactive<DashboardPublicState>({
+  widgets: [
+    {
+      id: "post",
+      label: "文章",
+      widgets: [
+        { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
+        { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
+      ],
+    },
+    {
+      id: "comment",
+      label: "评论",
+      widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "CommentStatsWidget" }],
+    },
+    {
+      id: "user",
+      label: "用户",
+      widgets: [
+        { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
+        { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentLoginWidget" },
+      ],
+    },
+    {
+      id: "plugin-journal",
+      label: "日志",
+      notice: "此组件由插件 plugin-journal 提供",
+      widgets: [
+        { x: 0, y: 0, w: 5, h: 8, i: 0, widget: "JournalPublishWidget" },
+      ],
+    },
+    {
+      id: "other",
+      label: "其他",
+      widgets: [
+        { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
+        { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },
+      ],
+    },
+  ],
+});
+
+useExtensionPointsData("DASHBOARD", publicState);
 
 const layout = useStorage("widgets", [
   { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },

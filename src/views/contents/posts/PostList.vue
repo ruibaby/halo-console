@@ -23,7 +23,7 @@ import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
 import { users } from "@/views/system/users/users-mock";
 import { useExtensionPointsData } from "@/core/plugin/plugins";
-import type { PostsPagePublicState } from "@/views/contents/posts/interface";
+import type { PostsPagePublicState } from "@halo-dev/admin-shared/src/types";
 
 const postsRef = ref(
   // eslint-disable-next-line
@@ -359,7 +359,7 @@ useExtensionPointsData("POSTS", state);
           :is="action.component"
           v-for="(action, index) in state.actions"
           :key="index"
-          v-bind="action.props"
+          v-bind="{ ...action.props }"
           v-on="action.events"
         >
           {{ action.slots.default }}
@@ -720,7 +720,7 @@ useExtensionPointsData("POSTS", state);
     :is="component.component"
     v-for="(component, index) in state.afterComponents"
     :key="index"
-    v-bind="component.props"
+    v-bind="{ ...component.props }"
     v-on="component.events"
   ></component>
 </template>

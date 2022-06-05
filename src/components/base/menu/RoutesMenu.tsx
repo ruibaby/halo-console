@@ -1,6 +1,9 @@
 import type { Component, PropType } from "vue";
 import { computed, defineComponent } from "vue";
-import type { MenuGroupType, MenuItemType } from "@/router/menus.config";
+import type {
+  MenuGroupType,
+  MenuItemType,
+} from "@halo-dev/admin-shared/src/types";
 import { VMenu, VMenuItem, VMenuLabel } from "@/components/base/menu/index";
 import type { RouteLocationMatched } from "vue-router";
 import { useRoute, useRouter } from "vue-router";

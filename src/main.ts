@@ -12,6 +12,7 @@ import Widgets from "@/views/dashboard/widgets";
 import { usePluginsStore } from "@/stores/plugins";
 import { registerMenu } from "@/router/menus.config";
 import { BasicLayout } from "@/layouts";
+import type { DefinedComponent } from "@vue/test-utils/dist/types";
 
 const app = createApp(App);
 
@@ -37,7 +38,16 @@ Promise.all(pluginAssets.map((asset: string) => import(asset)))
 
     pluginModules.forEach((pluginModule) => {
       pluginStore.registerPlugin(pluginModule);
+      console.log(`Loaded plugin(${pluginModule.name}):`, pluginModule);
 
+      // register components
+      if (pluginModule.components) {
+        pluginModule.components.forEach((component: DefinedComponent) => {
+          app.component(component.name, component);
+        });
+      }
+
+      // register routes
       if (pluginModule.routes) {
         // eslint-disable-next-line
         pluginModule.routes.forEach((route: any) => {
@@ -55,12 +65,13 @@ Promise.all(pluginAssets.map((asset: string) => import(asset)))
         });
       }
 
+      // register menus
       if (pluginModule.menus) {
         // eslint-disable-next-line
         pluginModule.menus.forEach((menu: any) => {
           // eslint-disable-next-line
           menu.items.forEach((item: any) => {
-            registerMenu(menu.group, item);
+            registerMenu(menu.name, item);
           });
         });
       }

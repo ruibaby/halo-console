@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Plugin } from "@/core/plugin/plugin";
+import type { Plugin } from "@halo-dev/admin-shared/src/types";
 
 interface PluginStoreState {
   plugins: Plugin[];

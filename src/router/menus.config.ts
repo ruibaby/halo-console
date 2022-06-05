@@ -10,20 +10,11 @@ import {
   IconSettings,
   IconUserSettings,
 } from "@/core/icons";
-import type { Component } from "vue";
 
-declare interface MenuGroupType {
-  name?: string;
-  items: MenuItemType[];
-}
-
-declare interface MenuItemType {
-  name: string;
-  path: string;
-  icon?: Component;
-  meta?: Record<string, unknown>;
-  children?: MenuItemType[];
-}
+import type {
+  MenuGroupType,
+  MenuItemType,
+} from "@halo-dev/admin-shared/src/types";
 
 export const menus: MenuGroupType[] = [
   {
@@ -136,7 +127,5 @@ export function registerMenu(group: string, menu: MenuItemType) {
     items: [menu],
   });
 }
-
-export type { MenuItemType, MenuGroupType };
 
 export default menus;

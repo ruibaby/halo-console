@@ -3,7 +3,7 @@ import type {
   ExtensionPointState,
   ExtensionPointType,
   Plugin,
-} from "@/core/plugin/plugin";
+} from "@halo-dev/admin-shared/src/types";
 
 export function useExtensionPointsData(
   point: ExtensionPointType,
