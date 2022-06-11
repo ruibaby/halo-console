@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VAlert } from "./index";
-import { VButton } from "@/components/base/button";
-import { IconMessage } from "@/core/icons";
+import { VButton } from "../button";
+import { IconMessage } from "../../../core/icons";
 
 function initState() {
   return {

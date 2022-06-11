@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
 import { computed, ref } from "vue";
-import { IconClose } from "@/core/icons";
+import { IconClose } from "../../../core/icons";
 
 const props = defineProps({
   visible: {

@@ -1,11 +1,4 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VModal } from "@/components/base/modal";
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
-import { VInput } from "@/components/base/input";
-import { VTag } from "@/components/base/tag";
 import { ref } from "vue";
 import { users } from "@/views/system/users/users-mock";
 import vueFilePond from "vue-filepond";
@@ -22,7 +15,7 @@ import {
   IconList,
   IconPalette,
   IconSettings,
-} from "@/core/icons";
+} from "@halo-dev/components";
 
 const viewTypes = [
   {

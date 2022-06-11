@@ -7,14 +7,16 @@ import github from "@/assets/logo-mock/github.svg";
 import redis from "@/assets/logo-mock/redis.svg";
 import elasticsearch from "@/assets/logo-mock/elasticsearch.svg";
 import algolia from "@/assets/logo-mock/algolia.svg";
+import umami from "@/assets/logo-mock/umami.ico";
+import { useStorage } from "@vueuse/core";
 
-export const plugins = [
+export const plugins = useStorage("plugins-mock", [
   {
     apiVersion: "v1",
     kind: "Plugin",
     metadata: {
       name: "阿里云 OSS",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "attachment",
       },
@@ -60,7 +62,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "OpenGraph Generator",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "common",
       },
@@ -84,7 +86,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "富文本编辑器",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "editor",
       },
@@ -107,7 +109,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "友情链接",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "page",
       },
@@ -130,7 +132,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "图库",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "page",
       },
@@ -153,7 +155,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "社区",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "page",
       },
@@ -182,13 +184,17 @@ export const plugins = [
         fields: ["id", "content", "author", "createdAt"],
       },
     ],
+    assets: {
+      name: "Forum",
+      script: "http://localhost:50660/halo-plugin-forum.iife.js",
+    },
   },
   {
     apiVersion: "v1",
     kind: "Plugin",
     metadata: {
       name: "微信公众号管理",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "common",
       },
@@ -205,13 +211,36 @@ export const plugins = [
       description: "托管微信公众号的管理，支持同步文章和管理媒体",
       license: "GPL V3",
     },
+    assets: {
+      name: "WeChatChannel",
+      script: "http://localhost:50876/halo-plugin-wechat-channel.iife.js",
+      style: "http://localhost:50876/style.css",
+    },
+    settings: [
+      {
+        label: "AppId",
+        type: "text",
+      },
+      {
+        label: "AppSecret",
+        type: "text",
+      },
+      {
+        label: "Token",
+        type: "text",
+      },
+      {
+        label: "EncodingAESKey",
+        type: "text",
+      },
+    ],
   },
   {
     apiVersion: "v1",
     kind: "Plugin",
     metadata: {
       name: "GitHub OAuth",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "auth",
       },
@@ -234,7 +263,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "Redis Cache",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "cache",
       },
@@ -257,7 +286,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "ElasticSearch",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "search-engine",
       },
@@ -280,7 +309,7 @@ export const plugins = [
     kind: "Plugin",
     metadata: {
       name: "Algolia",
-      enabled: true,
+      enabled: false,
       labels: {
         "extensions.halo.run/category": "search-engine",
       },
@@ -298,4 +327,32 @@ export const plugins = [
       license: "GPL V3",
     },
   },
-];
+  {
+    apiVersion: "v1",
+    kind: "Plugin",
+    metadata: {
+      name: "Umami",
+      enabled: false,
+      labels: {
+        "extensions.halo.run/category": "common",
+      },
+    },
+    spec: {
+      version: "1.0.0",
+      requires: ">=2.0.0",
+      author: "halo-dev",
+      logo: umami,
+      pluginClass: "run.halo.plugins.umami",
+      pluginDependencies: {},
+      homepage: "https://github.com/halo-dev/halo-plugin-umami",
+      shortDescription: "this is a test plugin",
+      description: "Umami 站点统计",
+      license: "GPL V3",
+    },
+    assets: {
+      name: "Umami",
+      script: "http://localhost:50787/halo-plugin-umami.iife.js",
+      style: "http://localhost:50787/style.css",
+    },
+  },
+]);

@@ -1,7 +1,4 @@
-<script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VInput } from "@/components/base/input";
-</script>
+<script lang="ts" setup></script>
 <template>
   <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
     <div class="space-y-6 space-y-5 divide-y divide-gray-100">

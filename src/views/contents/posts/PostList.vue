@@ -1,13 +1,4 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
-import { VInput } from "@/components/base/input";
-import { VPageHeader } from "@/components/base/header";
-import { VModal } from "@/components/base/modal";
-import { VTabItem, VTabs } from "@/components/base/tabs";
-import { VTextarea } from "@/components/base/textarea";
 import {
   IconAddCircle,
   IconArrowDown,
@@ -16,7 +7,8 @@ import {
   IconBookRead,
   IconDeleteBin,
   IconSettings,
-} from "@/core/icons";
+  VButton,
+} from "@halo-dev/components";
 import { posts } from "./posts-mock";
 import { computed, getCurrentInstance, markRaw, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -25,32 +17,12 @@ import { users } from "@/views/system/users/users-mock";
 import { useExtensionPointsData } from "@/core/plugin/plugins";
 import type { PostsPagePublicState } from "@halo-dev/admin-shared/src/types";
 
-const postsRef = ref(
-  // eslint-disable-next-line
-  posts.map((item: any) => {
-    return {
-      ...item,
-      checked: false,
-    };
-  })
-);
-
 const router = useRouter();
 const postSettings = ref(false);
 const settingActiveId = ref("general");
 // eslint-disable-next-line
 const selected = ref<Post | Record<string, any>>({});
 const saving = ref(false);
-
-const checkedCount = computed(() => {
-  return postsRef.value.filter((post) => post.checked).length;
-});
-
-const handleCheckAll = () => {
-  postsRef.value.forEach((item) => {
-    item.checked = state.checkAll;
-  });
-};
 
 console.log(getCurrentInstance());
 
@@ -108,11 +80,45 @@ const state = reactive<PostsPagePublicState>({
       },
     },
   ],
+  selectActions: [
+    {
+      component: markRaw(VButton),
+      props: {},
+      slots: {
+        default: "编辑",
+      },
+    },
+    {
+      component: markRaw(VButton),
+      props: {
+        type: "danger",
+      },
+      slots: {
+        default: "删除",
+      },
+    },
+  ],
   checkAll: false,
   afterComponents: [],
+  posts: posts.map((item: any) => {
+    return {
+      ...item,
+      checked: false,
+    };
+  }),
 });
 
 useExtensionPointsData("POSTS", state);
+
+const checkedCount = computed(() => {
+  return state.posts.filter((post) => post.checked).length;
+});
+
+const handleCheckAll = () => {
+  state.posts.forEach((item) => {
+    item.checked = state.checkAll;
+  });
+};
 </script>
 <template>
   <VModal v-model:visible="postSettings" :width="680" title="文章设置">
@@ -390,8 +396,15 @@ useExtensionPointsData("POSTS", state);
                 placeholder="输入关键词搜索"
               />
               <VSpace v-else>
-                <VButton type="default">设置</VButton>
-                <VButton type="danger">删除</VButton>
+                <component
+                  :is="action.component"
+                  v-for="(action, index) in state.selectActions"
+                  :key="index"
+                  v-bind="action.props"
+                  v-on="action.events"
+                >
+                  {{ action.slots.default }}
+                </component>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
@@ -571,7 +584,7 @@ useExtensionPointsData("POSTS", state);
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li
-          v-for="(post, index) in postsRef"
+          v-for="(post, index) in state.posts"
           :key="index"
           @click="handleRouteToEditor(post)"
         >
@@ -609,10 +622,10 @@ useExtensionPointsData("POSTS", state);
                 <div class="mt-1 flex">
                   <VSpace>
                     <span class="text-xs text-gray-500"
-                      >访问量 {{ post.visits }}</span
+                    >访问量 {{ post.visits }}</span
                     >
                     <span class="text-xs text-gray-500"
-                      >评论 {{ post.commentCount }}</span
+                    >评论 {{ post.commentCount }}</span
                     >
                   </VSpace>
                 </div>
@@ -720,7 +733,7 @@ useExtensionPointsData("POSTS", state);
     :is="component.component"
     v-for="(component, index) in state.afterComponents"
     :key="index"
-    v-bind="{ ...component.props }"
+    v-bind="component.props"
     v-on="component.events"
   ></component>
 </template>

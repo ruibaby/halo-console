@@ -79,6 +79,12 @@ import IconShieldUser from "~icons/ri/shield-user-line";
 import IconGitBranch from "~icons/ri/git-branch-line";
 // @ts-ignore
 import IconStopCircle from "~icons/ri/stop-circle-line";
+// @ts-ignore
+import IconWeChat from "~icons/ri/wechat-fill";
+// @ts-ignore
+import IconDiscuss from "~icons/ri/discuss-line";
+// @ts-ignore
+import IconHashtag from "~icons/ri/hashtag";
 
 export {
   IconDashboard,
@@ -121,4 +127,7 @@ export {
   IconShieldUser,
   IconGitBranch,
   IconStopCircle,
+  IconWeChat,
+  IconDiscuss,
+  IconHashtag,
 };

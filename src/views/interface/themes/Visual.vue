@@ -1,12 +1,4 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VModal } from "@/components/base/modal";
-import { VCard } from "@/components/base/card";
-import { VOption, VSelect } from "@/components/base/select";
-import { VInput } from "@/components/base/input";
-import { VTextarea } from "@/components/base/textarea";
-import { VSpace } from "@/components/base/space";
-import { VTabbar, VTabItem, VTabs } from "@/components/base/tabs";
 import { computed, onMounted, ref } from "vue";
 import {
   IconComputer,
@@ -14,7 +6,7 @@ import {
   IconSave,
   IconSettings,
   IconTablet,
-} from "@/core/icons";
+} from "@halo-dev/components";
 
 const activeId = ref("general");
 const deviceActiveId = ref("desktop");

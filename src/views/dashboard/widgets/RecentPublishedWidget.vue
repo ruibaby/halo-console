@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
 import { posts } from "@/views/contents/posts/posts-mock";
 </script>
 <template>

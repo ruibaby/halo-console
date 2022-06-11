@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { IconBookRead, IconSave } from "@/core/icons";
+import { IconBookRead, IconSave } from "@halo-dev/components";
 </script>
 
 <template>

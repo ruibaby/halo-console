@@ -1,16 +1,10 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VInput } from "@/components/base/input";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
 import {
   IconAddCircle,
   IconArrowDown,
   IconPlug,
   IconSettings,
-} from "@/core/icons";
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { plugins } from "./plugins-mock";
@@ -25,6 +19,14 @@ const handleRouteToDetail = (plugin: any) => {
     name: "PluginDetail",
     params: { id: plugin.spec.pluginClass },
   });
+};
+
+// eslint-disable-next-line
+const handleEnablePlugin = (plugin: any) => {
+  plugin.metadata.enabled = !plugin.metadata.enabled;
+  setTimeout(() => {
+    window.location.reload();
+  }, 200);
 };
 </script>
 <template>
@@ -187,11 +189,7 @@ const handleRouteToDetail = (plugin: any) => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(plugin, index) in plugins"
-          :key="index"
-          @click.stop="handleRouteToDetail(plugin)"
-        >
+        <li v-for="(plugin, index) in plugins" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -222,15 +220,13 @@ const handleRouteToDetail = (plugin: any) => {
                 </div>
               </div>
               <div class="flex-1">
-                <div class="flex flex-row items-center">
+                <div
+                  class="flex flex-row items-center"
+                  @click.stop="handleRouteToDetail(plugin)"
+                >
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
                     {{ plugin.metadata.name }}
                   </span>
-                  <VSpace>
-                    <VTag>
-                      {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
-                    </VTag>
-                  </VSpace>
                 </div>
                 <div class="mt-2 flex">
                   <VSpace align="start" direction="column" spacing="xs">
@@ -260,7 +256,77 @@ const handleRouteToDetail = (plugin: any) => {
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     2020-01-07
                   </time>
-                  <span class="cursor-pointer">
+                  <div class="flex items-center">
+                    <button
+                      :class="{
+                        'bg-themeable-primary-600': plugin.metadata.enabled,
+                        'bg-gray-200': !plugin.metadata.enabled,
+                      }"
+                      aria-checked="false"
+                      class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out"
+                      role="switch"
+                      type="button"
+                      @click="handleEnablePlugin(plugin)"
+                    >
+                      <span class="sr-only">Use setting</span>
+                      <span
+                        :class="{
+                          'translate-x-5': plugin.metadata.enabled,
+                          'translate-x-0': !plugin.metadata.enabled,
+                        }"
+                        class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                      >
+                        <span
+                          :class="{
+                            'opacity-0 duration-100 ease-out':
+                              plugin.metadata.enabled,
+                            'opacity-100 duration-200 ease-in':
+                              !plugin.metadata.enabled,
+                          }"
+                          aria-hidden="true"
+                          class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                        >
+                          <svg
+                            class="h-3 w-3 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 12 12"
+                          >
+                            <path
+                              d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                            />
+                          </svg>
+                        </span>
+                        <span
+                          :class="{
+                            'opacity-100 duration-200 ease-in':
+                              plugin.metadata.enabled,
+                            'opacity-0 duration-100 ease-out':
+                              !plugin.metadata.enabled,
+                          }"
+                          aria-hidden="true"
+                          class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                        >
+                          <svg
+                            class="h-3 w-3 text-themeable-primary-600"
+                            fill="currentColor"
+                            viewBox="0 0 12 12"
+                          >
+                            <path
+                              d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  <span
+                    class="cursor-pointer"
+                    @click.stop="handleRouteToDetail(plugin)"
+                  >
                     <IconSettings />
                   </span>
                 </div>

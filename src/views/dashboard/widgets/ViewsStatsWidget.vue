@@ -1,6 +1,4 @@
-<script lang="ts" setup>
-import { VCard } from "@/components/base/card";
-</script>
+<script lang="ts" setup></script>
 <template>
   <VCard class="h-full">
     <dt class="truncate text-sm font-medium text-gray-500">浏览量</dt>

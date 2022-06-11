@@ -4,9 +4,9 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import icons from "unplugin-icons/vite";
-import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
-import dts from "vite-plugin-dts";
+import Inspect from "vite-plugin-inspect";
+import { viteExternalsPlugin } from "vite-plugin-externals";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +14,6 @@ export default defineConfig({
     vue(),
     vueJsx(),
     icons(),
-    Compression(),
     VitePWA({
       manifest: {
         name: "Halo",
@@ -23,16 +22,22 @@ export default defineConfig({
         theme_color: "#fff",
       },
     }),
-    dts({
-      outputDir: "dist-typings",
-      entryRoot: "./src",
-      staticImport: true,
-    }),
+    Inspect(),
+    viteExternalsPlugin(
+      {
+        vue: "Vue",
+        "vue-router": "VueRouter",
+        pinia: "Pinia",
+        "@halo-dev/components": "components",
+      },
+      {
+        disableInServe: false,
+      }
+    ),
   ],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      vue: "vue/dist/vue.esm-bundler.js",
     },
   },
   test: {

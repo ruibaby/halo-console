@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import type { Component, PropType } from "vue";
 import { computed } from "vue";
-import type { Type } from "@/components/base/alert/interface";
+import type { Type } from "./interface";
 import {
   IconCheckboxCircle,
   IconClose,
   IconCloseCircle,
   IconErrorWarning,
   IconInformation,
-} from "@/core/icons";
+} from "../../../core/icons";
 
 const TypeIcons: Record<Type, Component> = {
   success: IconCheckboxCircle,
@@ -72,7 +72,7 @@ const handleClose = () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .alert-wrapper {
   @apply flex;
   @apply flex-col;

@@ -1,24 +1,36 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VTabbar } from "@/components/base/tabs";
 import { useRoute } from "vue-router";
 import { plugins } from "./plugins-mock";
-import { VTag } from "@/components/base/tag";
-import { VInput } from "@/components/base/input";
-import { VSpace } from "@/components/base/space";
-import { VCard } from "@/components/base/card";
 import { ref } from "vue";
+import { usePluginsStore } from "@/stores/plugins";
 
 const pluginActiveId = ref("detail");
 
 const { params } = useRoute();
 
-const plugin = plugins.find((item) => {
+const pluginStore = usePluginsStore();
+
+const plugin = plugins.value.find((item) => {
   return item.spec.pluginClass === params.id;
 });
 
-console.log(plugin);
+// eslint-disable-next-line
+const handleEnablePlugin = (plugin: any) => {
+  plugin.metadata.enabled = !plugin.metadata.enabled;
+  setTimeout(() => {
+    window.location.reload();
+  }, 200);
+};
+
+const pluginModule = pluginStore.plugins.find(
+  (p) => p.name === plugin?.assets?.name
+);
+
+const tabs = ref([{ id: "detail", label: "详情" }]);
+
+if (plugin?.settings && plugin?.settings.length) {
+  tabs.value.push({ id: "settings", label: "基础设置" });
+}
 </script>
 
 <template>
@@ -36,26 +48,91 @@ console.log(plugin);
       <template #header>
         <VTabbar
           v-model:active-id="pluginActiveId"
-          :items="[
-            { id: 'detail', label: '详情' },
-            { id: 'settings', label: '基础设置' },
-          ]"
+          :items="tabs"
           class="w-full !rounded-none"
           type="outline"
         ></VTabbar>
       </template>
 
       <div v-if="pluginActiveId === 'detail'">
-        <div class="px-4 py-4 sm:px-6">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
-          <p
-            class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
-          >
-            <span>{{ plugin.spec.version }}</span>
-            <VTag>
-              {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
-            </VTag>
-          </p>
+        <div class="flex items-center justify-between px-4 py-4 sm:px-6">
+          <div>
+            <h3 class="text-lg font-medium leading-6 text-gray-900">
+              插件信息
+            </h3>
+            <p
+              class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
+            >
+              <span>{{ plugin.spec.version }}</span>
+              <VTag>
+                {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
+              </VTag>
+            </p>
+          </div>
+          <div>
+            <button
+              :class="{
+                'bg-themeable-primary-600': plugin.metadata.enabled,
+                'bg-gray-200': !plugin.metadata.enabled,
+              }"
+              aria-checked="false"
+              class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out"
+              role="switch"
+              type="button"
+              @click="handleEnablePlugin(plugin)"
+            >
+              <span class="sr-only">Use setting</span>
+              <span
+                :class="{
+                  'translate-x-5': plugin.metadata.enabled,
+                  'translate-x-0': !plugin.metadata.enabled,
+                }"
+                class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              >
+                <span
+                  :class="{
+                    'opacity-0 duration-100 ease-out': plugin.metadata.enabled,
+                    'opacity-100 duration-200 ease-in':
+                      !plugin.metadata.enabled,
+                  }"
+                  aria-hidden="true"
+                  class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                >
+                  <svg
+                    class="h-3 w-3 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    />
+                  </svg>
+                </span>
+                <span
+                  :class="{
+                    'opacity-100 duration-200 ease-in': plugin.metadata.enabled,
+                    'opacity-0 duration-100 ease-out': !plugin.metadata.enabled,
+                  }"
+                  aria-hidden="true"
+                  class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                >
+                  <svg
+                    class="h-3 w-3 text-themeable-primary-600"
+                    fill="currentColor"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z"
+                    />
+                  </svg>
+                </span>
+              </span>
+            </button>
+          </div>
         </div>
         <div class="border-t border-gray-200">
           <dl class="divide-y divide-gray-100">
@@ -247,6 +324,67 @@ console.log(plugin);
                 </dl>
               </dd>
             </div>
+            <div
+              v-if="pluginModule && pluginModule.routes"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">后台路由</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
+                <ul class="space-y-2">
+                  <li
+                    v-for="(route, index) in pluginModule.routes"
+                    :key="index"
+                  >
+                    <div
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <span class="font-medium text-gray-900">
+                        {{ route.name }}
+                      </span>
+                      <div class="text-xs text-gray-400">
+                        <VSpace>
+                          <VTag>
+                            {{ route.path }}
+                          </VTag>
+                          <VTag>
+                            {{ route.component.name }}
+                          </VTag>
+                        </VSpace>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </dd>
+            </div>
+            <div
+              v-if="pluginModule && pluginModule.menus"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">后台菜单</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
+                <ul class="space-y-2">
+                  <li v-for="(menu, index) in pluginModule.menus" :key="index">
+                    <div
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <span class="font-medium text-gray-900">
+                        {{ menu.name }}
+                      </span>
+                      <div class="text-xs text-gray-400">
+                        <VSpace>
+                          <VTag
+                            v-for="(menuItem, itemIndex) in menu.items"
+                            :key="itemIndex"
+                          >
+                            {{ menuItem.name }}
+                          </VTag>
+                        </VSpace>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </dd>
+            </div>
           </dl>
         </div>
       </div>
@@ -255,26 +393,14 @@ console.log(plugin);
         <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
           <div class="space-y-6 space-y-5 divide-y divide-gray-100">
             <div
+              v-for="(setting, index) in plugin.settings"
+              :key="index"
               class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
-                设置项 1
-              </label>
-              <div class="mt-1 sm:col-span-3 sm:mt-0">
-                <div class="flex max-w-lg shadow-sm">
-                  <VInput />
-                </div>
-              </div>
-            </div>
-            <div
-              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
-            >
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                设置项 2
+                {{ setting.label }}
               </label>
               <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">

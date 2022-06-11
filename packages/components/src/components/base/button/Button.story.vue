@@ -138,7 +138,7 @@
 <script lang="ts" setup>
 import { VButton } from "./index";
 import { VSpace } from "../space";
-import { IconSettings } from "@/core/icons";
+import { IconSettings } from "../../../core/icons";
 
 function loadingState() {
   return {

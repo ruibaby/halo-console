@@ -1,4 +1,4 @@
-import { Component } from "vue";
+import { Component } from './vue/dist/vue.esm-bundler.js';
 
 declare interface MenuGroupType {
   name?: string;

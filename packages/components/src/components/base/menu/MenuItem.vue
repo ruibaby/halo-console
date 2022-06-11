@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconArrowRight } from "@/core/icons";
+import { IconArrowRight } from "../../../core/icons";
 import { computed, inject, ref, useSlots } from "vue";
 
 const props = defineProps({

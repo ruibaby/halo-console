@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
 import { users } from "@/views/system/users/users-mock";
 </script>
 <template>

@@ -1,34 +1,38 @@
 <script lang="ts" setup>
 import { BasicLayout } from "@/layouts";
-import { VButton } from "@/components/base/button";
-import { VTabbar } from "@/components/base/tabs";
-import { IconUpload } from "@/core/icons";
-import { onMounted, provide, ref } from "vue";
+import { IconUpload } from "@halo-dev/components";
+import { onMounted, provide, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { users } from "@/views/system/users/users-mock";
+import { UserProfileLayoutPublicStates } from "@halo-dev/admin-shared/src/types";
+import { useExtensionPointsData } from "@/core/plugin/plugins";
 
-const tabs = [
-  {
-    id: "detail",
-    label: "详情",
-    routeName: "UserDetail",
-  },
-  {
-    id: "tokens",
-    label: "个人令牌",
-    routeName: "PersonalAccessTokens",
-  },
-  {
-    id: "profile-modification",
-    label: "资料修改",
-    routeName: "ProfileModification",
-  },
-  {
-    id: "password-change",
-    label: "密码修改",
-    routeName: "PasswordChange",
-  },
-];
+const publicStates = reactive<UserProfileLayoutPublicStates>({
+  tabs: [
+    {
+      id: "detail",
+      label: "详情",
+      routeName: "UserDetail",
+    },
+    {
+      id: "tokens",
+      label: "个人令牌",
+      routeName: "PersonalAccessTokens",
+    },
+    {
+      id: "profile-modification",
+      label: "资料修改",
+      routeName: "ProfileModification",
+    },
+    {
+      id: "password-change",
+      label: "密码修改",
+      routeName: "PasswordChange",
+    },
+  ],
+});
+
+useExtensionPointsData("USER_SETTINGS", publicStates);
 
 const user = ref();
 
@@ -49,12 +53,14 @@ const router = useRouter();
 
 // set default active tab
 onMounted(() => {
-  const tab = tabs.find((tab) => tab.routeName === currentRouteName);
-  activeTab.value = tab ? tab.id : tabs[0].id;
+  const tab = publicStates.tabs.find(
+    (tab) => tab.routeName === currentRouteName
+  );
+  activeTab.value = tab ? tab.id : publicStates.tabs[0].id;
 });
 
 const handleTabChange = (id: string) => {
-  const tab = tabs.find((tab) => tab.id === id);
+  const tab = publicStates.tabs.find((tab) => tab.id === id);
   if (tab) {
     router.push({ name: tab.routeName });
   }
@@ -99,7 +105,7 @@ const handleTabChange = (id: string) => {
     <section class="bg-white p-4 sm:px-6 lg:px-8">
       <VTabbar
         v-model:active-id="activeTab"
-        :items="tabs"
+        :items="publicStates.tabs"
         class="w-full"
         type="outline"
         @change="handleTabChange"

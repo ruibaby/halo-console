@@ -3,10 +3,22 @@ import type { RouteRecordRaw } from "vue-router";
 import type { MenuGroupType } from "./menu";
 import type { PostsPagePublicState } from "./post";
 import type { DashboardPublicState } from "./dashboard";
+import type { UserProfileLayoutPublicStates } from "./user";
 
-export type ExtensionPointType = "POSTS" | "POST_EDITOR" | "DASHBOARD";
+export type ExtensionPointType =
+  | "POSTS"
+  | "POST_EDITOR"
+  | "DASHBOARD"
+  | "USER_SETTINGS";
 
-export type ExtensionPointState = PostsPagePublicState | DashboardPublicState;
+export type ExtensionPointState =
+  | PostsPagePublicState
+  | DashboardPublicState
+  | UserProfileLayoutPublicStates;
+
+export interface HaloRouteRecord extends RouteRecordRaw {
+  parent?: string;
+}
 
 export interface Plugin {
   name: string;
@@ -26,7 +38,7 @@ export interface Plugin {
    */
   deactivated?: () => void;
 
-  routes?: RouteRecordRaw[];
+  routes?: HaloRouteRecord[];
 
   menus?: MenuGroupType[];
 

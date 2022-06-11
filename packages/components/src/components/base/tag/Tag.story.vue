@@ -45,5 +45,5 @@
 <script lang="ts" setup>
 import { VTag } from "@/components/base/tag/index";
 import { VSpace } from "@/components/base/space/index";
-import { IconSettings } from "@/core/icons";
+import { IconSettings } from "../../../core/icons";
 </script>

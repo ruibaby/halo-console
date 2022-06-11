@@ -39,7 +39,7 @@ import type { PropType } from "vue";
 import { computed } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRouter } from "vue-router";
-import type { Size, Type } from "@/components/base/button/interface";
+import type { Size, Type } from "./interface";
 
 const props = defineProps({
   type: {

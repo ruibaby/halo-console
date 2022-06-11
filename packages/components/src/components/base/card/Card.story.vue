@@ -3,7 +3,7 @@ import { VCard } from "./index";
 import { VInput } from "@/components/base/input";
 import { VSpace } from "@/components/base/space";
 import { VButton } from "@/components/base/button";
-import { IconSettings } from "@/core/icons";
+import { IconSettings } from "../../../core/icons";
 </script>
 
 <template>

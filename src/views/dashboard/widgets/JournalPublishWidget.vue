@@ -1,8 +1,4 @@
-<script lang="ts" setup>
-import { VCard } from "@/components/base/card";
-import { VTextarea } from "@/components/base/textarea";
-import { VButton } from "@/components/base/button";
-</script>
+<script lang="ts" setup></script>
 <template>
   <VCard
     :bodyClass="['h-full', 'overflow-y-auto']"

@@ -44,5 +44,5 @@ import {
   IconFolder,
   IconMessage,
   IconPages,
-} from "@/core/icons";
+} from "../../../core/icons";
 </script>
