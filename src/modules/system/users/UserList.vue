@@ -12,13 +12,15 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { ref } from "vue";
-import { Starport } from "vue-starport";
-import axiosInstance from "@/utils/api-client";
+import UserCreationModal from "./components/UserCreationModal.vue";
+import { onMounted, ref } from "vue";
+import { axiosInstance } from "@halo-dev/admin-shared";
 import type { User } from "@/types/extension";
 
 const checkAll = ref(false);
+const creationModal = ref<boolean>(false);
 const users = ref<User[]>([]);
+const selectedUser = ref<User | null>(null);
 
 const handleFetchUsers = async () => {
   try {
@@ -29,9 +31,22 @@ const handleFetchUsers = async () => {
   }
 };
 
-handleFetchUsers();
+const handleOpenCreateModal = (user: User) => {
+  selectedUser.value = user;
+  creationModal.value = true;
+};
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
+  <UserCreationModal
+    v-model:visible="creationModal"
+    :user="selectedUser"
+    @close="handleFetchUsers"
+  />
+
   <VPageHeader title="用户">
     <template #icon>
       <IconUserSettings class="mr-2 self-center" />
@@ -44,7 +59,7 @@ handleFetchUsers();
           </template>
           角色管理
         </VButton>
-        <VButton type="secondary">
+        <VButton type="secondary" @click="creationModal = true">
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -175,16 +190,7 @@ handleFetchUsers();
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(user, index) in users"
-          :key="index"
-          @click="
-            $router.push({
-              name: 'UserDetail',
-              params: { name: user.metadata.name },
-            })
-          "
-        >
+        <li v-for="(user, index) in users" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -204,21 +210,25 @@ handleFetchUsers();
                 />
               </div>
               <div v-if="user.spec.avatar" class="mr-4">
-                <Starport
-                  :duration="400"
-                  :port="`user-profile-${user.metadata.name}`"
-                  class="h-12 w-12"
-                >
+                <div class="h-12 w-12">
                   <img
                     :alt="user.spec.displayName"
                     :src="user.spec.avatar"
                     class="h-full w-full overflow-hidden rounded border bg-white hover:shadow-sm"
                   />
-                </Starport>
+                </div>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span class="mr-2 truncate text-sm font-medium text-gray-900">
+                  <span
+                    class="mr-2 truncate text-sm font-medium text-gray-900"
+                    @click="
+                      $router.push({
+                        name: 'UserDetail',
+                        params: { name: user.metadata.name },
+                      })
+                    "
+                  >
                     {{ user.spec.displayName }}
                   </span>
                   <VTag class="sm:hidden">{{ user.metadata.name }}</VTag>
@@ -244,7 +254,7 @@ handleFetchUsers();
                     {{ user.metadata.creationTimestamp }}
                   </time>
                   <span class="cursor-pointer">
-                    <IconSettings />
+                    <IconSettings @click="handleOpenCreateModal(user)" />
                   </span>
                 </div>
               </div>

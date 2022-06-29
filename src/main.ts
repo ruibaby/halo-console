@@ -2,17 +2,21 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import type { Plugin } from "@halo-dev/admin-shared";
+import type {
+  MenuGroupType,
+  MenuItemType,
+  Plugin,
+} from "@halo-dev/admin-shared";
+import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-import { registerMenu } from "@/router/menus.config";
 
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const app = createApp(App);
 
@@ -63,6 +67,34 @@ function loadCoreModules() {
 
 const pluginStore = usePluginStore();
 
+function loadStyle(href: string) {
+  return new Promise(function (resolve, reject) {
+    let shouldAppend = false;
+    let el: HTMLLinkElement | null = document.querySelector(
+      'script[src="' + href + '"]'
+    );
+    if (!el) {
+      el = document.createElement("link");
+      el.rel = "stylesheet";
+      el.type = "text/css";
+      el.href = href;
+      shouldAppend = true;
+    } else if (el.hasAttribute("data-loaded")) {
+      resolve(el);
+      return;
+    }
+
+    el.addEventListener("error", reject);
+    el.addEventListener("abort", reject);
+    el.addEventListener("load", function loadStyleHandler() {
+      el?.setAttribute("data-loaded", "true");
+      resolve(el);
+    });
+
+    if (shouldAppend) document.head.prepend(el);
+  });
+}
+
 async function loadPluginModules() {
   const response = await axiosInstance.get(
     `/apis/plugin.halo.run/v1alpha1/plugins`
@@ -74,7 +106,7 @@ async function loadPluginModules() {
   );
 
   for (const plugin of plugins) {
-    const { entry } = plugin.status;
+    const { entry, stylesheet } = plugin.status;
 
     if (entry) {
       const { load } = useScriptTag(
@@ -90,6 +122,10 @@ async function loadPluginModules() {
       }
     }
 
+    if (stylesheet) {
+      await loadStyle(`http://localhost:8090${stylesheet}`);
+    }
+
     pluginStore.registerPlugin(plugin);
   }
 }
@@ -102,6 +138,9 @@ async function initApp() {
   try {
     loadCoreModules();
     await loadPluginModules();
+
+    app.provide<MenuGroupType[]>("menus", menus);
+    app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {
     console.error(e);
   } finally {
