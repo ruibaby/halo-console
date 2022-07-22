@@ -12,6 +12,7 @@ export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";
 
   return defineConfig({
+    base: "./",
     plugins: [
       Vue(),
       VueJsx(),
@@ -56,6 +57,7 @@ export default ({ mode }: { mode: string }) => {
           description: "Web Client For Halo",
           theme_color: "#fff",
         },
+        disable: true,
       }),
     ],
     resolve: {

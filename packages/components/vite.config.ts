@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     Vue(),
     VueJsx(),
-    Icons(),
+    Icons({ compiler: "vue3" }),
     Dts({
       entryRoot: "./src",
       outputDir: "./dist",
@@ -28,7 +28,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "HaloComponents",
-      formats: ["es", "cjs", "umd", "iife"],
+      formats: ["es", "iife"],
       fileName: (format) => `halo-components.${format}.js`,
     },
     rollupOptions: {

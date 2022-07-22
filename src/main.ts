@@ -1,3 +1,4 @@
+import type { DirectiveBinding } from "vue";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
@@ -7,6 +8,7 @@ import type {
   MenuItemType,
   Plugin,
 } from "@halo-dev/admin-shared";
+import { apiClient, setApiUrl } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
@@ -16,11 +18,14 @@ import { setupComponents } from "./setup/setupComponents";
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
+import { hasPermission } from "@/utils/permission";
+import { useRoleStore } from "@/stores/role";
 
 const app = createApp(App);
 
 setupComponents(app);
+setApiUrl(import.meta.env.VITE_API_URL);
 
 app.use(createPinia());
 
@@ -96,21 +101,23 @@ function loadStyle(href: string) {
 }
 
 async function loadPluginModules() {
-  const response = await axiosInstance.get(
-    `/apis/plugin.halo.run/v1alpha1/plugins`
-  );
+  const { data } =
+    await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
 
   // Get all started plugins
-  const plugins = response.data.filter(
-    (plugin) => plugin.status.phase === "STARTED" && plugin.spec.enabled
+  const plugins = data.items.filter(
+    (plugin) => plugin.status?.phase === "STARTED" && plugin.spec.enabled
   );
 
   for (const plugin of plugins) {
-    const { entry, stylesheet } = plugin.status;
+    const { entry, stylesheet } = plugin.status || {
+      entry: "",
+      stylesheet: "",
+    };
 
     if (entry) {
       const { load } = useScriptTag(
-        `http://localhost:8090${plugin.status.entry}`
+        `http://localhost:8090${plugin.status?.entry}`
       );
       await load();
       const pluginModule = window[plugin.metadata.name];
@@ -123,11 +130,42 @@ async function loadPluginModules() {
     }
 
     if (stylesheet) {
-      await loadStyle(`http://localhost:8090${stylesheet}`);
+      try {
+        await loadStyle(`http://localhost:8090${stylesheet}`);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     pluginStore.registerPlugin(plugin);
   }
+}
+
+async function loadCurrentUser() {
+  const { data: user } = await apiClient.user.getCurrentUserDetail();
+  app.provide<User>("currentUser", user);
+
+  const { data: currentPermissions } = await apiClient.user.getPermissions("-");
+  const roleStore = useRoleStore();
+  roleStore.$patch({
+    permissions: currentPermissions,
+  });
+  app.directive(
+    "permission",
+    (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
+      const uiPermissions = Array.from<string>(
+        currentPermissions.uiPermissions
+      );
+      const { value } = binding;
+      const { any, enable } = binding.modifiers;
+
+      if (hasPermission(uiPermissions, value, any)) {
+        return;
+      }
+
+      enable ? (el.style.backgroundColor = "red") : el.remove();
+    }
+  );
 }
 
 (async function () {
@@ -135,10 +173,16 @@ async function loadPluginModules() {
 })();
 
 async function initApp() {
+  // TODO 实验性
+  const theme = localStorage.getItem("theme");
+  if (theme) {
+    document.body.classList.add(theme);
+  }
+
   try {
     loadCoreModules();
     await loadPluginModules();
-
+    await loadCurrentUser();
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {

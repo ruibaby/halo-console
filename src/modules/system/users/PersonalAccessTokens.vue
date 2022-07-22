@@ -4,15 +4,14 @@ import {
   IconDeleteBin,
   IconStopCircle,
   VButton,
-  VInput,
   VModal,
   VSpace,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import type { PersonalAccessToken } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { PersonalAccessToken } from "@halo-dev/api-client";
 
 const createVisible = ref(false);
 const createActiveId = ref("general");
@@ -21,10 +20,9 @@ const personalAccessTokens = ref<PersonalAccessToken[]>([]);
 
 const handleFetchPersonalAccessTokens = async () => {
   try {
-    const response = await axiosInstance.get(
-      "/api/v1alpha1/personalaccesstokens"
-    );
-    personalAccessTokens.value = response.data;
+    const { data } =
+      await apiClient.extension.personalAccessToken.listv1alpha1PersonalAccessToken();
+    personalAccessTokens.value = data.items;
   } catch (e) {
     console.error(e);
   }
@@ -38,30 +36,10 @@ onMounted(() => {
   <VModal v-model:visible="createVisible" :width="720" title="创建个人令牌">
     <VTabs v-model:active-id="createActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                名称
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                失效日期
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-          </div>
-        </form>
+        <FormKit id="role-form" :actions="false" type="form">
+          <FormKit label="名称" type="text" validation="required"></FormKit>
+          <FormKit label="失效日期" type="text" validation="required"></FormKit>
+        </FormKit>
       </VTabItem>
       <VTabItem id="permissions" label="权限">
         <div>
@@ -76,7 +54,7 @@ onMounted(() => {
                 <ul class="space-y-2">
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -94,7 +72,7 @@ onMounted(() => {
                   </li>
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -120,7 +98,7 @@ onMounted(() => {
                 <ul class="space-y-2">
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -138,7 +116,7 @@ onMounted(() => {
                   </li>
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -162,7 +140,7 @@ onMounted(() => {
                 <ul class="space-y-2">
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -180,7 +158,7 @@ onMounted(() => {
                   </li>
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -207,7 +185,7 @@ onMounted(() => {
                 <ul class="space-y-2">
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -225,7 +203,7 @@ onMounted(() => {
                   </li>
                   <li>
                     <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"

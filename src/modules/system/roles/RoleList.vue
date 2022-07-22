@@ -6,30 +6,39 @@ import {
   IconShieldUser,
   VButton,
   VCard,
-  VInput,
-  VModal,
   VPageHeader,
+  VPagination,
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import RoleCreationModal from "./components/RoleCreationModal.vue";
 import { useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
-import type { Role } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { computed, onMounted, ref } from "vue";
+import type { Role } from "@halo-dev/api-client";
+import { apiClient } from "@halo-dev/admin-shared";
+import { roleLabels } from "@/constants/labels";
+import { pluginAnnotations, rbacAnnotations } from "@/constants/annotations";
 
 const createVisible = ref(false);
 const roles = ref<Role[]>([]);
+
+const basicRoles = computed(() => {
+  return roles.value.filter(
+    (role) => role.metadata?.labels?.[roleLabels.TEMPLATE] !== "true"
+  );
+});
 
 const router = useRouter();
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
-    roles.value = data;
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
+    roles.value = data.items;
   } catch (e) {
     console.error(e);
   }
 };
+
 const handleRouteToDetail = (name: string) => {
   router.push({ name: "RoleDetail", params: { name } });
 };
@@ -39,14 +48,21 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VModal v-model:visible="createVisible" title="新建角色"></VModal>
+  <RoleCreationModal
+    v-model:visible="createVisible"
+    @close="handleFetchRoles"
+  />
 
   <VPageHeader title="角色">
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary" @click="createVisible = true">
+      <VButton
+        v-permission="['system:roles:manage']"
+        type="secondary"
+        @click="createVisible = true"
+      >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
@@ -63,7 +79,7 @@ onMounted(() => {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput class="w-full sm:w-72" placeholder="输入关键词搜索" />
+              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -152,7 +168,7 @@ onMounted(() => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li
-          v-for="(role, index) in roles"
+          v-for="(role, index) in basicRoles"
           :key="index"
           @click="handleRouteToDetail(role.metadata.name)"
         >
@@ -163,12 +179,24 @@ onMounted(() => {
               <div class="flex-1">
                 <div class="flex flex-row items-center">
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{ role.metadata.name }}
+                    {{
+                      role.metadata.annotations?.[
+                        pluginAnnotations.DISPLAY_NAME
+                      ] || role.metadata.name
+                    }}
                   </span>
                 </div>
                 <div class="mt-2 flex">
                   <span class="text-xs text-gray-500">
-                    包含 {{ role.rules?.length }} 个权限
+                    包含
+                    {{
+                      JSON.parse(
+                        role.metadata.annotations?.[
+                          rbacAnnotations.DEPENDENCIES
+                        ] || "[]"
+                      ).length
+                    }}
+                    个权限
                   </span>
                 </div>
               </div>
@@ -186,7 +214,10 @@ onMounted(() => {
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     2020-01-07
                   </time>
-                  <span class="cursor-pointer">
+                  <span
+                    v-permission="['system:roles:manage']"
+                    class="cursor-pointer"
+                  >
                     <IconSettings />
                   </span>
                 </div>
@@ -197,78 +228,8 @@ onMounted(() => {
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <div>
-              <nav
-                aria-label="Pagination"
-                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-              >
-                <a
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Previous</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  aria-current="page"
-                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
-                  href="#"
-                >
-                  1
-                </a>
-                <a
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  2
-                </a>
-                <span
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-                >
-                  ...
-                </span>
-                <a
-                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
-                  href="#"
-                >
-                  4
-                </a>
-                <a
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Next</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </nav>
-            </div>
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination :page="1" :size="10" :total="20" />
         </div>
       </template>
     </VCard>

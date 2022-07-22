@@ -2,27 +2,23 @@
 import {
   IconAddCircle,
   IconArrowDown,
-  IconArrowLeft,
-  IconArrowRight,
   IconBookRead,
   IconDeleteBin,
   IconSettings,
   VButton,
   VCard,
-  VInput,
-  VModal,
   VPageHeader,
+  VPagination,
   VSpace,
-  VTabItem,
-  VTabs,
   VTag,
-  VTextarea,
 } from "@halo-dev/components";
+import PostSettingModal from "./components/PostSettingModal.vue";
 import { posts } from "./posts-mock";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
-import { users } from "@/modules/system/users/users-mock";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
 
 const postsRef = ref(
   // eslint-disable-next-line
@@ -37,14 +33,22 @@ const postsRef = ref(
 const router = useRouter();
 const checkAll = ref(false);
 const postSettings = ref(false);
-const settingActiveId = ref("general");
 // eslint-disable-next-line
-const selected = ref<Post | Record<string, any>>({});
-const saving = ref(false);
+const selected = ref<Post | Record<string, unknown> | null>({});
+const users = ref<User[]>([]);
 
 const checkedCount = computed(() => {
   return postsRef.value.filter((post) => post.checked).length;
 });
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await apiClient.extension.user.listv1alpha1User();
+    users.value = data.items;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const handleCheckAll = () => {
   postsRef.value.forEach((item) => {
@@ -59,14 +63,18 @@ const handleSelect = (post: any) => {
 };
 
 const handleSelectPrevious = () => {
-  const currentIndex = posts.findIndex((post) => post.id === selected.value.id);
+  const currentIndex = posts.findIndex(
+    (post) => post.id === selected.value?.id
+  );
   if (currentIndex > 0) {
     selected.value = posts[currentIndex - 1];
   }
 };
 
 const handleSelectNext = () => {
-  const currentIndex = posts.findIndex((post) => post.id === selected.value.id);
+  const currentIndex = posts.findIndex(
+    (post) => post.id === selected.value?.id
+  );
   if (currentIndex < posts.length - 1) {
     selected.value = posts[currentIndex + 1];
   }
@@ -81,230 +89,18 @@ const handleRouteToEditor = (post: any) => {
     },
   });
 };
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
-  <VModal v-model:visible="postSettings" :width="680" title="文章设置">
-    <template #actions>
-      <div class="modal-header-action" @click="handleSelectPrevious">
-        <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="handleSelectNext">
-        <IconArrowRight />
-      </div>
-    </template>
-
-    <VTabs v-model:active-id="settingActiveId" type="outline">
-      <VTabItem id="general" label="常规">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                标题
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.title"></VInput>
-              </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                别名
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.slug"></VInput>
-              </div>
-            </div>
-
-            <div
-              class="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:pt-5"
-            >
-              <label class="block text-sm font-medium text-gray-700">
-                分类目录
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                标签
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                摘要
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VTextarea v-model="selected.summary"></VTextarea>
-              </div>
-            </div>
-          </div>
-        </form>
-      </VTabItem>
-      <VTabItem id="advanced" label="高级">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                禁止评论
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.disallowComment"></VInput>
-              </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                是否置顶
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.topPriority"></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                发表时间
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                自定义模板
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.template"></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                访问密码
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="selected.password"></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                封面图
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VSpace align="start" class="w-full" direction="column">
-                  <div class="w-full sm:w-1/2">
-                    <div
-                      class="aspect-w-10 aspect-h-7 block cursor-pointer overflow-hidden rounded bg-gray-100"
-                    >
-                      <img
-                        :src="selected.thumbnail"
-                        alt=""
-                        class="pointer-events-none object-cover"
-                      />
-                    </div>
-                  </div>
-                  <VInput v-model="selected.thumbnail"></VInput>
-                </VSpace>
-              </div>
-            </div>
-          </div>
-        </form>
-      </VTabItem>
-      <VTabItem id="seo" label="SEO">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                自定义关键词
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VTextarea
-                  v-model="selected.metaKeywords"
-                  :rows="5"
-                ></VTextarea>
-              </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                自定义描述
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VTextarea
-                  v-model="selected.metaDescription"
-                  :rows="5"
-                ></VTextarea>
-              </div>
-            </div>
-          </div>
-        </form>
-      </VTabItem>
-      <VTabItem id="metas" label="元数据"></VTabItem>
-      <VTabItem id="inject-code" label="代码注入">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                CSS
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VTextarea :rows="5"></VTextarea>
-              </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                JavaScript
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VTextarea :rows="5"></VTextarea>
-              </div>
-            </div>
-          </div>
-        </form>
-      </VTabItem>
-    </VTabs>
-
-    <template #footer>
-      <VSpace>
-        <VButton :loading="saving" type="secondary" @click="saving = !saving">
-          保存
-        </VButton>
-        <VButton type="default" @click="postSettings = false">取消</VButton>
-      </VSpace>
-    </template>
-  </VModal>
+  <PostSettingModal
+    v-model:visible="postSettings"
+    :post="selected"
+    @next="handleSelectNext"
+    @previous="handleSelectPrevious"
+  />
   <VPageHeader title="文章">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -343,11 +139,11 @@ const handleRouteToEditor = (post: any) => {
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput
+              <FormKit
                 v-if="checkedCount <= 0"
-                class="w-full sm:w-72"
                 placeholder="输入关键词搜索"
-              />
+                type="text"
+              ></FormKit>
               <VSpace v-else>
                 <VButton type="default">设置</VButton>
                 <VButton type="danger">删除</VButton>
@@ -402,7 +198,10 @@ const handleRouteToEditor = (post: any) => {
                   </div>
                   <template #popper>
                     <div class="h-96 w-80 p-4">
-                      <VInput placeholder="根据关键词搜索"></VInput>
+                      <FormKit
+                        placeholder="输入关键词搜索"
+                        type="text"
+                      ></FormKit>
                     </div>
                   </template>
                 </FloatingDropdown>
@@ -417,7 +216,10 @@ const handleRouteToEditor = (post: any) => {
                   </div>
                   <template #popper>
                     <div class="h-96 w-80 p-4">
-                      <VInput placeholder="根据关键词搜索"></VInput>
+                      <FormKit
+                        placeholder="输入关键词搜索"
+                        type="text"
+                      ></FormKit>
                     </div>
                   </template>
                 </FloatingDropdown>
@@ -434,7 +236,10 @@ const handleRouteToEditor = (post: any) => {
                     <div class="h-96 w-80 p-4">
                       <div class="bg-white">
                         <!--TODO: Auto Focus-->
-                        <VInput placeholder="根据关键词搜索"></VInput>
+                        <FormKit
+                          placeholder="输入关键词搜索"
+                          type="text"
+                        ></FormKit>
                       </div>
                       <div class="mt-2">
                         <ul class="divide-y divide-gray-200" role="list">
@@ -452,8 +257,8 @@ const handleRouteToEditor = (post: any) => {
                               </div>
                               <div class="flex-shrink-0">
                                 <img
-                                  :alt="user.name"
-                                  :src="user.avatar"
+                                  :alt="user.spec.displayName"
+                                  :src="user.spec.avatar"
                                   class="h-10 w-10 rounded"
                                 />
                               </div>
@@ -461,10 +266,10 @@ const handleRouteToEditor = (post: any) => {
                                 <p
                                   class="truncate text-sm font-medium text-gray-900"
                                 >
-                                  {{ user.name }}
+                                  {{ user.spec.displayName }}
                                 </p>
                                 <p class="truncate text-sm text-gray-500">
-                                  @{{ user.username }}
+                                  @{{ user.metadata.name }}
                                 </p>
                               </div>
                               <div>
@@ -529,20 +334,16 @@ const handleRouteToEditor = (post: any) => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(post, index) in postsRef"
-          :key="index"
-          @click="handleRouteToEditor(post)"
-        >
+        <li v-for="(post, index) in postsRef" :key="index">
           <div
             :class="{
-              'bg-gray-100': selected.id === post.id || post.checked,
+              'bg-gray-100': selected?.id === post.id || post.checked,
             }"
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
             <div
-              v-show="selected.id === post.id || post.checked"
-              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+              v-show="selected?.id === post.id || post.checked"
+              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
             ></div>
             <div class="relative flex flex-row items-center">
               <div class="mr-4 hidden items-center sm:flex">
@@ -556,6 +357,7 @@ const handleRouteToEditor = (post: any) => {
                 <div class="flex flex-col sm:flex-row">
                   <span
                     class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
+                    @click="handleRouteToEditor(post)"
                   >
                     {{ post.title }}
                   </span>
@@ -598,78 +400,8 @@ const handleRouteToEditor = (post: any) => {
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <div>
-              <nav
-                aria-label="Pagination"
-                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-              >
-                <a
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Previous</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  aria-current="page"
-                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
-                  href="#"
-                >
-                  1
-                </a>
-                <a
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  2
-                </a>
-                <span
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-                >
-                  ...
-                </span>
-                <a
-                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
-                  href="#"
-                >
-                  4
-                </a>
-                <a
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Next</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </nav>
-            </div>
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination :page="1" :size="10" :total="20" />
         </div>
       </template>
     </VCard>

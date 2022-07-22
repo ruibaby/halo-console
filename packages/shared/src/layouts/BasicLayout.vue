@@ -9,9 +9,10 @@ import {
   VTag,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "@/types/menus";
+import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 
 const menus = inject<MenuGroupType>("menus");
 const minimenus = inject<MenuItemType>("minimenus");
@@ -22,15 +23,25 @@ const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 const spotlight = ref(false);
 
+const currentUser = inject<User>("currentUser");
+
 const handleRouteToProfile = () => {
-  router.push({ path: "/users/profile/detail" });
+  router.push({ path: `/users/${currentUser?.metadata.name}/detail` });
 };
+
+const currentRole = computed(() => {
+  return JSON.parse(
+    currentUser?.metadata.annotations?.[
+      "rbac.authorization.halo.run/role-names"
+    ] || "[]"
+  )[0];
+});
 </script>
 
 <template>
   <div class="flex h-full">
     <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
-      <div class="logo flex justify-center py-5">
+      <div class="logo flex justify-center pt-5 pb-7">
         <img :src="logo" alt="Halo Logo" style="width: 78px" />
       </div>
       <div class="px-3">
@@ -47,17 +58,19 @@ const handleRouteToProfile = () => {
       </div>
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
-        <div class="profile-avatar">
-          <img class="h-11 w-11 rounded-full" src="https://ryanc.cc/avatar" />
+        <div v-if="currentUser.spec.avatar" class="profile-avatar">
+          <img :src="currentUser.spec.avatar" class="h-11 w-11 rounded-full" />
         </div>
         <div class="profile-name">
-          <div class="flex text-sm font-medium">Ryan Wang</div>
+          <div class="flex text-sm font-medium">
+            {{ currentUser.spec.displayName }}
+          </div>
           <div class="flex">
             <VTag>
               <template #leftIcon>
                 <IconUserSettings />
               </template>
-              管理员
+              {{ currentRole }}
             </VTag>
           </div>
         </div>
@@ -76,8 +89,7 @@ const handleRouteToProfile = () => {
 
     <!--bottom nav bar-->
     <div
-      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden"
-      style="background: #0e1731"
+      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden bg-secondary"
     >
       <div
         v-for="(menu, index) in minimenus"
@@ -179,24 +191,24 @@ const handleRouteToProfile = () => {
   padding-bottom: 70px;
 
   .current-profile {
-    background: #fff;
-    position: fixed;
-    left: 0;
-    bottom: 0;
     height: 70px;
-    display: flex;
-    @apply w-64;
-    @apply p-3;
+    @apply w-64
+    bg-white
+    p-3
+    flex
+    fixed
+    left-0
+    bottom-0
+    gap-3;
 
     .profile-avatar {
-      @apply self-center;
-      @apply flex;
+      @apply self-center
+      flex;
     }
 
     .profile-name {
-      @apply self-center;
-      @apply flex-1;
-      @apply ml-3;
+      @apply self-center
+      flex-1;
     }
 
     .profile-control {
@@ -206,11 +218,11 @@ const handleRouteToProfile = () => {
 }
 
 .content {
-  @apply ml-0;
-  @apply md:ml-64;
-  display: flex;
-  flex: auto;
-  flex-direction: column;
-  overflow-x: hidden;
+  @apply ml-0
+  flex
+  flex-auto
+  flex-col
+  overflow-x-hidden
+  md:ml-64;
 }
 </style>

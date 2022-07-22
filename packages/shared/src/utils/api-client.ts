@@ -1,12 +1,71 @@
+import {
+  PluginHaloRunV1alpha1PluginApi,
+  V1alpha1UserApi,
+  ApiHaloRunV1alpha1UserApi,
+  V1alpha1ConfigMapApi,
+  V1alpha1PersonalAccessTokenApi,
+  V1alpha1RoleBindingApi,
+  V1alpha1RoleApi,
+  V1alpha1SettingApi,
+  PluginHaloRunV1alpha1ReverseProxyApi,
+  CoreHaloRunV1alpha1LinkApi,
+  CoreHaloRunV1alpha1LinkGroupApi,
+} from "@halo-dev/api-client";
 import axios from "axios";
+import type { AxiosInstance } from "axios";
 
-const token =
-  "eyJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJIYWxvIE93bmVyIiwic3ViIjoiYWRtaW4iLCJleHAiOjE2NTY0NzM3NTMsImlhdCI6MTY1NjM4NzM1Mywic2NvcGUiOlsiUk9MRV9zdXBlci1yb2xlIl19.vJ7l6jo3CJv7h4XTDvqjY70qngpaiiYhJL7_vXNPRY2Rz2NdmosMzy-BIRYPRuJnhU33uQ5LjXY5K2YwyQinrIsT66JsfckuYi6slAQY2rUC3929wC3gBcMJp9Z--VGRA701vDoecGWnGh68XR-RCK_uGcMnNhC4A1bCsb-nrn4TYdUndM0Aa2OsGP6G0IjzuyvXwwoAGB2JojBdGzXVz2KujHsaELziAZ2Kx78wsEIREN0pZGXnapB1-0nqgjLQ9VuGl62bRAkyzirwbasgB6Tk8njz-TR_uIL-smyWt_LUwX5I97lrM5VCtMmBlT999_Zi8MgzWTHeEUobzbI4ng";
+let apiUrl: string | undefined;
 const axiosInstance = axios.create({
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-  baseURL: "http://localhost:8090",
+  withCredentials: true,
 });
 
-export { axiosInstance };
+let apiClient = setupApiClient(axiosInstance);
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    console.log("error", error);
+    if (error.response.status === 401) {
+      window.location.href = "/#/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+const setApiUrl = (url: string) => {
+  axiosInstance.defaults.baseURL = url;
+  apiUrl = url;
+  apiClient = setupApiClient(axiosInstance);
+};
+
+function setupApiClient(axios: AxiosInstance) {
+  return {
+    extension: {
+      configMap: new V1alpha1ConfigMapApi(undefined, apiUrl, axios),
+      personalAccessToken: new V1alpha1PersonalAccessTokenApi(
+        undefined,
+        apiUrl,
+        axios
+      ),
+      roleBinding: new V1alpha1RoleBindingApi(undefined, apiUrl, axios),
+      role: new V1alpha1RoleApi(undefined, apiUrl, axios),
+      setting: new V1alpha1SettingApi(undefined, apiUrl, axios),
+      reverseProxy: new PluginHaloRunV1alpha1ReverseProxyApi(
+        undefined,
+        apiUrl,
+        axios
+      ),
+      plugin: new PluginHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
+      user: new V1alpha1UserApi(undefined, apiUrl, axios),
+
+      // TODO optional
+      link: new CoreHaloRunV1alpha1LinkApi(undefined, apiUrl, axios),
+      linkGroup: new CoreHaloRunV1alpha1LinkGroupApi(undefined, apiUrl, axios),
+    },
+    user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
+  };
+}
+
+export { apiClient, setApiUrl };

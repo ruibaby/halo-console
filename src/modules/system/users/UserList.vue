@@ -7,33 +7,73 @@ import {
   IconUserSettings,
   VButton,
   VCard,
-  VInput,
   VPageHeader,
+  VPagination,
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import UserCreationModal from "./components/UserCreationModal.vue";
+import UserEditingModal from "./components/UserEditingModal.vue";
+import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { onMounted, ref } from "vue";
-import { axiosInstance } from "@halo-dev/admin-shared";
-import type { User } from "@/types/extension";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { User, UserList } from "@halo-dev/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const checkAll = ref(false);
-const creationModal = ref<boolean>(false);
-const users = ref<User[]>([]);
+const editingModal = ref<boolean>(false);
+const passwordChangeModal = ref<boolean>(false);
+const users = ref<UserList>({
+  page: 1,
+  size: 10,
+  total: 0,
+  items: [],
+  first: true,
+  last: false,
+  hasNext: false,
+  hasPrevious: false,
+});
 const selectedUser = ref<User | null>(null);
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User(
+      users.value.page,
+      users.value.size
+    );
     users.value = data;
   } catch (e) {
     console.error(e);
+  } finally {
+    selectedUser.value = null;
   }
+};
+
+const handlePaginationChange = async ({
+  page,
+  size,
+}: {
+  page: number;
+  size: number;
+}) => {
+  users.value.page = page;
+  users.value.size = size;
+  await handleFetchUsers();
 };
 
 const handleOpenCreateModal = (user: User) => {
   selectedUser.value = user;
-  creationModal.value = true;
+  editingModal.value = true;
+};
+
+const handleOpenPasswordChangeModal = (user: User) => {
+  selectedUser.value = user;
+  passwordChangeModal.value = true;
+};
+
+const getRoles = (user: User) => {
+  return JSON.parse(
+    user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
+  );
 };
 
 onMounted(() => {
@@ -41,8 +81,16 @@ onMounted(() => {
 });
 </script>
 <template>
-  <UserCreationModal
-    v-model:visible="creationModal"
+  <UserEditingModal
+    v-model:visible="editingModal"
+    v-permission="['system:users:manage']"
+    :user="selectedUser"
+    @close="handleFetchUsers"
+  />
+
+  <UserPasswordChangeModal
+    v-model:visible="passwordChangeModal"
+    v-permission="['system:users:manage']"
     :user="selectedUser"
     @close="handleFetchUsers"
   />
@@ -53,13 +101,22 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Roles' }" size="sm" type="default">
+        <VButton
+          v-permission="['system:roles:view']"
+          :route="{ name: 'Roles' }"
+          size="sm"
+          type="default"
+        >
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
           角色管理
         </VButton>
-        <VButton type="secondary" @click="creationModal = true">
+        <VButton
+          v-permission="['system:users:manage']"
+          type="secondary"
+          @click="editingModal = true"
+        >
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -79,16 +136,17 @@ onMounted(() => {
             <div class="mr-4 hidden items-center sm:flex">
               <input
                 v-model="checkAll"
+                v-permission="['system:users:manage']"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput
+              <FormKit
                 v-if="!checkAll"
-                class="w-full sm:w-72"
                 placeholder="输入关键词搜索"
-              />
+                type="text"
+              ></FormKit>
               <VSpace v-else>
                 <VButton type="default">设置</VButton>
                 <VButton type="danger">删除</VButton>
@@ -190,7 +248,7 @@ onMounted(() => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(user, index) in users" :key="index">
+        <li v-for="(user, index) in users.items" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -199,12 +257,13 @@ onMounted(() => {
           >
             <div
               v-show="checkAll"
-              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
             ></div>
             <div class="relative flex flex-row items-center">
               <div class="mr-4 hidden items-center sm:flex">
                 <input
                   v-model="checkAll"
+                  v-permission="['system:users:manage']"
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   type="checkbox"
                 />
@@ -245,16 +304,44 @@ onMounted(() => {
                 <div
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
-                  <div class="hidden items-center sm:flex">
+                  <div
+                    v-for="(role, index) in getRoles(user)"
+                    :key="index"
+                    class="hidden items-center sm:flex"
+                  >
                     <VTag>
-                      {{ user.metadata.name }}
+                      {{ role }}
                     </VTag>
                   </div>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     {{ user.metadata.creationTimestamp }}
                   </time>
-                  <span class="cursor-pointer">
-                    <IconSettings @click="handleOpenCreateModal(user)" />
+                  <span
+                    v-permission="['system:users:manage']"
+                    class="cursor-pointer"
+                  >
+                    <FloatingDropdown>
+                      <IconSettings />
+                      <template #popper>
+                        <div class="links-w-48 links-p-2">
+                          <VSpace class="links-w-full" direction="column">
+                            <VButton
+                              block
+                              type="secondary"
+                              @click="handleOpenCreateModal(user)"
+                            >
+                              修改资料
+                            </VButton>
+                            <VButton
+                              block
+                              @click="handleOpenPasswordChangeModal(user)"
+                            >
+                              修改密码
+                            </VButton>
+                          </VSpace>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                   </span>
                 </div>
               </div>
@@ -264,78 +351,13 @@ onMounted(() => {
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <div>
-              <nav
-                aria-label="Pagination"
-                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-              >
-                <a
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Previous</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  aria-current="page"
-                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
-                  href="#"
-                >
-                  1
-                </a>
-                <a
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  2
-                </a>
-                <span
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-                >
-                  ...
-                </span>
-                <a
-                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
-                  href="#"
-                >
-                  4
-                </a>
-                <a
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Next</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </nav>
-            </div>
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination
+            :page="users.page"
+            :size="users.size"
+            :total="users.total"
+            @change="handlePaginationChange"
+          />
         </div>
       </template>
     </VCard>

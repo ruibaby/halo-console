@@ -5,8 +5,8 @@ import {
   IconSettings,
   VButton,
   VCard,
-  VInput,
   VPageHeader,
+  VPagination,
   VSpace,
 } from "@halo-dev/components";
 import { ref } from "vue";
@@ -40,11 +40,11 @@ const checkAll = ref(false);
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput
+              <FormKit
                 v-if="!checkAll"
-                class="w-full sm:w-72"
                 placeholder="输入关键词搜索"
-              />
+                type="text"
+              ></FormKit>
               <VSpace v-else>
                 <VButton type="default">设置</VButton>
                 <VButton type="danger">删除</VButton>
@@ -91,7 +91,7 @@ const checkAll = ref(false);
           >
             <div
               v-show="checkAll"
-              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
             ></div>
             <div class="relative flex flex-row items-center">
               <div class="mr-4 hidden items-center sm:flex">
@@ -137,78 +137,8 @@ const checkAll = ref(false);
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <div>
-              <nav
-                aria-label="Pagination"
-                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-              >
-                <a
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Previous</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  aria-current="page"
-                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
-                  href="#"
-                >
-                  1
-                </a>
-                <a
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  2
-                </a>
-                <span
-                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-                >
-                  ...
-                </span>
-                <a
-                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
-                  href="#"
-                >
-                  4
-                </a>
-                <a
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  href="#"
-                >
-                  <span class="sr-only">Next</span>
-                  <svg
-                    aria-hidden="true"
-                    class="h-5 w-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      clip-rule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      fill-rule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </nav>
-            </div>
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination :page="1" :size="10" :total="20" />
         </div>
       </template>
     </VCard>

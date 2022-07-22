@@ -10,44 +10,148 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
-import { users } from "@/modules/system/users/users-mock";
-import { axiosInstance } from "@halo-dev/admin-shared";
-import type { Role } from "@/types/extension";
+import { computed, onMounted, ref } from "vue";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Role, User } from "@halo-dev/api-client";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
+
+interface RoleTemplateGroup {
+  module: string | null | undefined;
+  roles: Role[];
+}
+
+interface FormState {
+  role: Role;
+  selectedRoleTemplates: string[];
+  saving: boolean;
+}
 
 const route = useRoute();
 
-const role = ref<Role>();
+const users = ref<User[]>([]);
+const roles = ref<Role[]>([]);
 const roleActiveId = ref("detail");
+const formState = ref<FormState>({
+  role: {
+    apiVersion: "v1alpha1",
+    kind: "Role",
+    metadata: {
+      name: "",
+      labels: {},
+      annotations: {
+        [rbacAnnotations.DEPENDENCIES]: "",
+        [rbacAnnotations.DISPLAY_NAME]: "",
+      },
+    },
+    rules: [],
+  },
+  selectedRoleTemplates: [],
+  saving: false,
+});
+
+const roleTemplates = computed<Role[]>(() => {
+  return roles.value.filter(
+    (role) =>
+      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
+      role.metadata.labels?.["halo.run/hidden"] !== "true"
+  );
+});
+
+const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
+  const groups: RoleTemplateGroup[] = [];
+  roleTemplates.value.forEach((role) => {
+    const group = groups.find(
+      (group) =>
+        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
+    );
+    if (group) {
+      group.roles.push(role);
+    } else {
+      groups.push({
+        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
+        roles: [role],
+      });
+    }
+  });
+  return groups;
+});
 
 const handleFetchRole = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/api/v1alpha1/roles/${route.params.name}`
+    const response = await apiClient.extension.role.getv1alpha1Role(
+      route.params.name as string
     );
-    role.value = response.data;
+    formState.value.role = response.data;
+    formState.value.selectedRoleTemplates = JSON.parse(
+      response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
+    );
   } catch (error) {
     console.error(error);
   }
 };
 
+const handleFetchRoles = async () => {
+  try {
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
+    roles.value = data.items;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await apiClient.extension.user.listv1alpha1User();
+    users.value = data.items;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const handleUpdateRole = async () => {
+  try {
+    formState.value.saving = true;
+    if (formState.value.role.metadata.annotations) {
+      formState.value.role.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
+        JSON.stringify(formState.value.selectedRoleTemplates);
+    }
+    await apiClient.extension.role.updatev1alpha1Role(
+      route.params.name as string,
+      formState.value.role
+    );
+  } catch (e) {
+    console.error(e);
+  } finally {
+    formState.value.saving = false;
+    await handleFetchRole();
+  }
+};
+
 const router = useRouter();
 
-const handleRouteToUser = (username: string) => {
-  router.push({ name: "UserDetail", params: { username } });
+const handleRouteToUser = (name: string) => {
+  router.push({ name: "UserDetail", params: { name } });
 };
 
 onMounted(() => {
   handleFetchRole();
+  handleFetchRoles();
+  handleFetchUsers();
 });
 </script>
 <template>
-  <VPageHeader :title="`角色：${role?.metadata?.name}`">
+  <VPageHeader
+    :title="`角色：${
+      formState.role?.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+      formState.role?.metadata?.name
+    }`"
+  >
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary">
+      <VButton v-permission="['system:roles:manage']" type="secondary">
         <template #icon>
           <IconGitBranch class="h-full w-full" />
         </template>
@@ -74,7 +178,17 @@ onMounted(() => {
           <p
             class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
           >
-            <span>包含 {{ role?.rules?.length }} 个权限</span>
+            <span
+              >包含
+              {{
+                JSON.parse(
+                  formState.role.metadata.annotations?.[
+                    rbacAnnotations.DEPENDENCIES
+                  ] || "[]"
+                ).length
+              }}
+              个权限</span
+            >
           </p>
         </div>
         <div class="border-t border-gray-200">
@@ -84,7 +198,11 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">名称</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ role?.metadata?.name }}
+                {{
+                  formState.role?.metadata?.annotations?.[
+                    rbacAnnotations.DISPLAY_NAME
+                  ] || formState.role?.metadata?.name
+                }}
               </dd>
             </div>
             <div
@@ -92,7 +210,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">别名</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ role?.metadata?.name }}
+                {{ formState.role?.metadata?.name }}
               </dd>
             </div>
             <div
@@ -116,7 +234,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">创建时间</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ role?.metadata?.creationTimestamp }}
+                {{ formState.role?.metadata?.creationTimestamp }}
               </dd>
             </div>
             <div
@@ -132,7 +250,7 @@ onMounted(() => {
                       v-for="(user, index) in users"
                       :key="index"
                       class="block cursor-pointer hover:bg-gray-50"
-                      @click="handleRouteToUser(user.username)"
+                      @click="handleRouteToUser(user.metadata.name)"
                     >
                       <div class="flex items-center px-4 py-4">
                         <div class="flex min-w-0 flex-1 items-center">
@@ -142,8 +260,8 @@ onMounted(() => {
                                 class="overflow-hidden rounded border bg-white hover:shadow-sm"
                               >
                                 <img
-                                  :alt="user.name"
-                                  :src="user.avatar"
+                                  :alt="user.spec.displayName"
+                                  :src="user.spec.avatar"
                                   class="h-full w-full"
                                 />
                               </div>
@@ -156,11 +274,11 @@ onMounted(() => {
                               <p
                                 class="truncate text-sm font-medium text-gray-900"
                               >
-                                {{ user.name }}
+                                {{ user.spec.displayName }}
                               </p>
                               <p class="mt-2 flex items-center">
                                 <span class="text-xs text-gray-500">
-                                  {{ user.username }}
+                                  {{ user.metadata.name }}
                                 </span>
                               </p>
                             </div>
@@ -183,230 +301,89 @@ onMounted(() => {
         <div>
           <dl class="divide-y divide-gray-100">
             <div
+              v-for="(group, groupIndex) in roleTemplateGroups"
+              :key="groupIndex"
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">
-                Posts Management
+                <div>
+                  {{ group.module }}
+                </div>
+                <div
+                  v-if="
+                    group.roles.length &&
+                    group.roles[0].metadata.labels?.[pluginLabels.NAME]
+                  "
+                  class="mt-3 text-xs text-gray-500"
+                >
+                  由
+                  <RouterLink
+                    :to="{
+                      name: 'PluginDetail',
+                      params: {
+                        name: group.roles[0].metadata.labels?.[
+                          pluginLabels.NAME
+                        ],
+                      },
+                    }"
+                    class="hover:text-blue-600"
+                  >
+                    {{ group.roles[0].metadata.labels?.[pluginLabels.NAME] }}
+                  </RouterLink>
+                  插件提供
+                </div>
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <ul class="space-y-2">
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                  <li v-for="(role, index) in group.roles" :key="index">
+                    <label
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
+                        v-model="formState.selectedRoleTemplates"
+                        :value="role.metadata.name"
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
                       />
-                      <div class="inline-flex flex-col gap-y-3">
+                      <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
-                          Posts Management
+                          {{
+                            role.metadata.annotations?.[
+                              rbacAnnotations.DISPLAY_NAME
+                            ]
+                          }}
                         </span>
-                        <span class="text-xs text-gray-400">
-                          依赖于 Posts View
+                        <span
+                          v-if="
+                            role.metadata.annotations?.[
+                              rbacAnnotations.DEPENDENCIES
+                            ]
+                          "
+                          class="text-xs text-gray-400"
+                        >
+                          依赖于
+                          {{
+                            JSON.parse(
+                              role.metadata.annotations?.[
+                                rbacAnnotations.DEPENDENCIES
+                              ]
+                            ).join(", ")
+                          }}
                         </span>
                       </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Posts View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                Categories Management
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul class="space-y-2">
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Categories Management
-                        </span>
-                        <span class="text-xs text-gray-400">
-                          依赖于 Categories View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Categories View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">Tags Management</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul class="space-y-2">
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Tags Management
-                        </span>
-                        <span class="text-xs text-gray-400">
-                          依赖于 Tags View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Tags View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                Plugins Management
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul class="space-y-2">
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Plugins Management
-                        </span>
-                        <span class="text-xs text-gray-400">
-                          依赖于 Plugins View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Plugins View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt
-                class="flex flex-col gap-y-3 text-sm font-medium text-gray-900"
-              >
-                <span> Discussions Management </span>
-                <span class="text-xs text-gray-400"> 由社区插件提供 </span>
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul class="space-y-2">
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Discussions Management
-                        </span>
-                        <span class="text-xs text-gray-400">
-                          依赖于 Discussions View
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <input
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                      />
-                      <div class="inline-flex flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          Discussions View
-                        </span>
-                      </div>
-                    </div>
+                    </label>
                   </li>
                 </ul>
               </dd>
             </div>
           </dl>
-          <div class="p-4">
-            <VButton type="secondary">保存</VButton>
+          <div v-permission="['system:roles:manage']" class="p-4">
+            <VButton
+              :loading="formState.saving"
+              type="secondary"
+              @click="handleUpdateRole"
+              >保存
+            </VButton>
           </div>
         </div>
       </div>
