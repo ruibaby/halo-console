@@ -6,16 +6,18 @@ import type { Role, User } from "@halo-dev/api-client";
 import {
   IconCodeBoxLine,
   IconEye,
-  IconSave,
   VButton,
   VCodemirror,
   VModal,
+  VSpace,
 } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
+import { useMagicKeys } from "@vueuse/core";
+import { submitForm } from "@formkit/core";
 
 const props = defineProps({
   visible: {
@@ -82,7 +84,20 @@ const basicRoles = computed(() => {
   );
 });
 
+const { Command_Enter } = useMagicKeys();
+
 watch(props, (newVal) => {
+  let keyboardWatcher;
+  if (newVal.visible) {
+    keyboardWatcher = watch(Command_Enter, (v) => {
+      if (v) {
+        submitForm("user-form");
+      }
+    });
+  } else {
+    keyboardWatcher?.unwatch();
+  }
+
   if (newVal.visible && props.user) {
     formState.value.user = cloneDeep(props.user);
     return;
@@ -148,6 +163,7 @@ const handleRawModeChange = () => {
     formState.value.user = YAML.parse(formState.value.raw);
   }
 };
+
 onMounted(handleFetchRoles);
 </script>
 <template>
@@ -175,7 +191,7 @@ onMounted(handleFetchRoles);
       <FormKit id="user-form" type="form" @submit="handleCreateUser">
         <FormKit
           v-model="formState.user.metadata.name"
-          :disabled="true"
+          :disabled="isUpdateMode"
           label="用户名"
           type="text"
           validation="required"
@@ -204,7 +220,6 @@ onMounted(handleFetchRoles);
         "
           label="角色"
           type="select"
-          validation="required"
         ></FormKit>
         <FormKit
           v-model="formState.user.spec.phone"
@@ -224,16 +239,16 @@ onMounted(handleFetchRoles);
       </FormKit>
     </div>
     <template #footer>
-      <VButton
-        :loading="formState.saving"
-        type="secondary"
-        @click="$formkit.submit('user-form')"
-      >
-        <template #icon>
-          <IconSave class="h-full w-full" />
-        </template>
-        保存
-      </VButton>
+      <VSpace>
+        <VButton
+          :loading="formState.saving"
+          type="secondary"
+          @click="$formkit.submit('user-form')"
+        >
+          保存 ⌘ + ↵
+        </VButton>
+        <VButton @click="handleVisibleChange(false)">取消 Esc</VButton>
+      </VSpace>
     </template>
   </VModal>
 </template>

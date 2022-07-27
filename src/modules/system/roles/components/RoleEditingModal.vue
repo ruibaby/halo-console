@@ -1,103 +1,89 @@
 <script lang="ts" setup>
-import { VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
+import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
+import type { PropType } from "vue";
 import { computed, ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
-import type { Role } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
-import { roleLabels } from "@/constants/labels";
-
-interface RoleTemplateGroup {
-  module: string | null | undefined;
-  roles: Role[];
-}
-
-interface CreationFormState {
-  role: Role;
-  selectedRoleTemplates: string[];
-  saving: boolean;
-}
+import type { Role } from "@halo-dev/api-client";
+import {
+  useRoleForm,
+  useRoleTemplateSelection,
+} from "@/modules/system/roles/composables/use-role";
+import cloneDeep from "lodash.clonedeep";
+import { submitForm } from "@formkit/core";
+import { useMagicKeys } from "@vueuse/core";
 
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false,
   },
+  role: {
+    type: Object as PropType<Role | null>,
+    default: null,
+  },
 });
 
 const emit = defineEmits(["update:visible", "close"]);
 
-const creationActiveId = ref("general");
-const roles = ref<Role[]>([]);
-const creationFormState = ref<CreationFormState>({
-  role: {
-    apiVersion: "v1alpha1",
-    kind: "Role",
-    metadata: {
-      name: "",
-      labels: {},
-      annotations: {
-        [rbacAnnotations.DEPENDENCIES]: "",
-        [rbacAnnotations.DISPLAY_NAME]: "",
-      }!,
-    },
-    rules: [],
-  },
-  selectedRoleTemplates: [],
-  saving: false,
-});
+const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
+  useRoleTemplateSelection();
 
-const roleTemplates = computed<Role[]>(() => {
-  return roles.value.filter(
-    (role) =>
-      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
-      role.metadata.labels?.["halo.run/hidden"] !== "true"
-  );
-});
+const {
+  formState,
+  isUpdateMode,
+  initialFormState,
+  saving,
+  handleCreateOrUpdate,
+} = useRoleForm();
 
-const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
-  const groups: RoleTemplateGroup[] = [];
-  roleTemplates.value.forEach((role) => {
-    const group = groups.find(
-      (group) =>
-        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
-    );
-    if (group) {
-      group.roles.push(role);
-    } else {
-      groups.push({
-        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
-        roles: [role],
-      });
+watch(
+  () => selectedRoleTemplates.value,
+  (newValue) => {
+    if (formState.value.metadata.annotations) {
+      formState.value.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
+        JSON.stringify(Array.from(newValue));
     }
-  });
-  return groups;
-});
-
-const handleFetchRoles = async () => {
-  try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data.items;
-  } catch (e) {
-    console.error(e);
   }
-};
+);
 
-const handleCreateRole = async () => {
-  try {
-    creationFormState.value.saving = true;
-    if (creationFormState.value.role.metadata.annotations) {
-      creationFormState.value.role.metadata.annotations[
-        rbacAnnotations.DEPENDENCIES
-      ] = JSON.stringify(creationFormState.value.selectedRoleTemplates);
+watch(props, (newVal) => {
+  const { Command_Enter } = useMagicKeys();
+  let keyboardWatcher;
+  if (newVal.visible) {
+    keyboardWatcher = watch(Command_Enter, (v) => {
+      if (v) {
+        submitForm("role-form");
+      }
+    });
+  } else {
+    keyboardWatcher?.unwatch();
+  }
+
+  if (newVal.visible && props.role) {
+    formState.value = cloneDeep(props.role);
+    const dependencies =
+      props.role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
+    if (dependencies) {
+      selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
     }
-    await apiClient.extension.role.createv1alpha1Role(
-      creationFormState.value.role
-    );
+    return;
+  }
+  formState.value = cloneDeep(initialFormState);
+  selectedRoleTemplates.value.clear();
+});
+
+const tabActiveId = ref("general");
+
+const editingModalTitle = computed(() => {
+  return isUpdateMode.value ? "编辑角色" : "创建角色";
+});
+
+const handleCreateOrUpdateRole = async () => {
+  try {
+    await handleCreateOrUpdate();
     handleVisibleChange(false);
   } catch (e) {
     console.error(e);
-  } finally {
-    creationFormState.value.saving = false;
   }
 };
 
@@ -107,44 +93,33 @@ const handleVisibleChange = (visible: boolean) => {
     emit("close");
   }
 };
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      handleFetchRoles();
-    }
-  }
-);
 </script>
 <template>
   <VModal
     :visible="visible"
     :width="700"
-    title="创建角色"
+    :title="editingModalTitle"
     @update:visible="handleVisibleChange"
   >
-    <VTabs v-model:active-id="creationActiveId" type="outline">
+    <VTabs v-model:active-id="tabActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
         <FormKit
-          v-if="creationFormState.role.metadata.annotations"
+          v-if="formState.metadata.annotations"
           id="role-form"
           :actions="false"
           type="form"
-          @submit="handleCreateRole"
+          @submit="handleCreateOrUpdateRole"
         >
           <FormKit
             v-model="
-              creationFormState.role.metadata.annotations[
-                rbacAnnotations.DISPLAY_NAME
-              ]
+              formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
             "
             label="名称"
             type="text"
             validation="required"
           ></FormKit>
           <FormKit
-            v-model="creationFormState.role.metadata.name"
+            v-model="formState.metadata.name"
             help="角色别名，用于区分角色，不能重复，创建之后不能修改"
             label="别名"
             type="text"
@@ -167,13 +142,14 @@ watch(
                 <ul class="space-y-2">
                   <li v-for="(role, index) in group.roles" :key="index">
                     <label
-                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
+                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                     >
                       <input
-                        v-model="creationFormState.selectedRoleTemplates"
+                        v-model="selectedRoleTemplates"
                         :value="role.metadata.name"
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
+                        @change="handleRoleTemplateSelect"
                       />
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
@@ -211,12 +187,16 @@ watch(
       </VTabItem>
     </VTabs>
     <template #footer>
-      <VButton
-        :loading="creationFormState.saving"
-        type="secondary"
-        @click="$formkit.submit('role-form')"
-        >创建
-      </VButton>
+      <VSpace>
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit('role-form')"
+        >
+          提交 ⌘ + ↵
+        </VButton>
+        <VButton @click="handleVisibleChange(false)">取消 Esc</VButton>
+      </VSpace>
     </template>
   </VModal>
 </template>

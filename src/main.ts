@@ -1,7 +1,8 @@
 import type { DirectiveBinding } from "vue";
-import { createApp } from "vue";
+import { createApp, ref } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import LoadingMessageContainer from "./LoadingMessageContainer.vue";
 import router from "./router";
 import type {
   MenuGroupType,
@@ -10,10 +11,10 @@ import type {
 } from "@halo-dev/admin-shared";
 import { apiClient, setApiUrl } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
+import type { LoadingMessage } from "@/loading-message";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
@@ -21,6 +22,20 @@ import { usePluginStore } from "@/stores/plugin";
 import type { User } from "@halo-dev/api-client";
 import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";
+
+// TODO 实验性
+const messages = ref<LoadingMessage[]>([]);
+const messageContainerApp = createApp({
+  data: () => ({
+    messages: messages,
+  }),
+  components: {
+    LoadingMessageContainer,
+  },
+  template: `
+    <LoadingMessageContainer :messages="messages"/>`,
+});
+messageContainerApp.mount("#app");
 
 const app = createApp(App);
 
@@ -67,7 +82,16 @@ function registerModule(pluginModule: Plugin) {
 }
 
 function loadCoreModules() {
+  const coreLoadStartTime = Date.now();
+  messages.value.push({
+    type: "info",
+    message: "Loading core modules...",
+  });
   coreModules.forEach(registerModule);
+  messages.value.push({
+    type: "info",
+    message: `All core modules loaded(${Date.now() - coreLoadStartTime}ms)`,
+  });
 }
 
 const pluginStore = usePluginStore();
@@ -100,7 +124,14 @@ function loadStyle(href: string) {
   });
 }
 
+const pluginErrorMessages: Array<string> = [];
+
 async function loadPluginModules() {
+  messages.value.push({
+    type: "info",
+    message: "Loading plugins...",
+  });
+
   const { data } =
     await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
 
@@ -116,28 +147,82 @@ async function loadPluginModules() {
     };
 
     if (entry) {
-      const { load } = useScriptTag(
-        `http://localhost:8090${plugin.status?.entry}`
-      );
-      await load();
-      const pluginModule = window[plugin.metadata.name];
+      try {
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loading entry module...`,
+        });
 
-      if (pluginModule) {
-        // @ts-ignore
-        plugin.spec.module = pluginModule;
-        registerModule(pluginModule);
+        const { load } = useScriptTag(
+          `${import.meta.env.VITE_API_URL}${plugin.status?.entry}`
+        );
+
+        const entryLoadStartTime = Date.now();
+
+        await load();
+
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loaded entry module(${
+            Date.now() - entryLoadStartTime
+          }ms)`,
+        });
+
+        const pluginModule = window[plugin.metadata.name];
+
+        if (pluginModule) {
+          // @ts-ignore
+          plugin.spec.module = pluginModule;
+          registerModule(pluginModule);
+        }
+      } catch (e) {
+        const message = `${plugin.metadata.name}: Failed load plugin entry module`;
+        messages.value.push({
+          type: "error",
+          message,
+        });
+        console.error(message, e);
+        pluginErrorMessages.push(message);
       }
     }
 
     if (stylesheet) {
       try {
-        await loadStyle(`http://localhost:8090${stylesheet}`);
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loading stylesheet...`,
+        });
+        const styleLoadStartTime = Date.now();
+
+        await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
+
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loaded stylesheet(${
+            Date.now() - styleLoadStartTime
+          }ms)`,
+        });
       } catch (e) {
-        console.error(e);
+        const message = `${plugin.metadata.name}: Failed load plugin stylesheet`;
+        messages.value.push({
+          type: "error",
+          message,
+        });
+        console.error(message, e);
+        pluginErrorMessages.push(message);
       }
     }
 
     pluginStore.registerPlugin(plugin);
+  }
+
+  messages.value.push({
+    type: "info",
+    message: "All plugins loaded",
+  });
+
+  if (pluginErrorMessages.length > 0) {
+    alert(pluginErrorMessages.join("\n"));
   }
 }
 
@@ -189,6 +274,7 @@ async function initApp() {
     console.error(e);
   } finally {
     app.use(router);
+    messageContainerApp.unmount();
     app.mount("#app");
   }
 }

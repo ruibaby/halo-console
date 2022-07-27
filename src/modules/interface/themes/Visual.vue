@@ -13,14 +13,14 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, shallowRef } from "vue";
 
 const activeId = ref("general");
 const deviceActiveId = ref("desktop");
 const attachmentSelectVisible = ref(false);
 const settingRootVisible = ref(false);
 const settingVisible = ref(false);
-const devices = ref([
+const devices = shallowRef([
   {
     id: "desktop",
     icon: IconComputer,
@@ -151,7 +151,7 @@ onMounted(() => {
         <iframe
           :class="iframeClasses"
           class="border-none transition-all duration-300"
-          src="http://localhost:8090"
+          src="https://halo.run"
         ></iframe>
       </div>
     </div>
