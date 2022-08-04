@@ -1,29 +1,28 @@
 <script lang="ts" setup>
 // core libs
-import { computed, inject, ref, watchEffect } from "vue";
-
-// hooks
-import { useSettingForm } from "@halo-dev/admin-shared";
+import { computed, inject, onMounted, ref } from "vue";
 
 // components
 import { VButton } from "@halo-dev/components";
 
 // types
 import type { Ref } from "vue";
-import type { Plugin } from "@halo-dev/api-client";
+import type { Theme } from "@halo-dev/api-client";
 
-const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
+// hooks
+import { useSettingForm } from "@halo-dev/admin-shared";
+
+const selectedTheme = inject<Ref<Theme>>("selectedTheme", ref({} as Theme));
 const group = inject<Ref<string | undefined>>("activeTab");
 
-const settingName = computed(() => plugin.value.spec?.settingName);
-const configMapName = computed(() => plugin.value.spec?.configMapName);
-
+const settingName = computed(() => selectedTheme.value.spec?.settingName);
+const configMapName = computed(() => selectedTheme.value.spec?.configMapName);
 const {
   settings,
   configMapFormData,
   saving,
-  handleFetchSettings,
   handleFetchConfigMap,
+  handleFetchSettings,
   handleSaveConfigMap,
 } = useSettingForm(settingName, configMapName);
 
@@ -35,11 +34,9 @@ const formSchema = computed(() => {
     ?.formSchema;
 });
 
-watchEffect(async () => {
-  if (settingName.value && configMapName.value) {
-    await handleFetchSettings();
-    await handleFetchConfigMap();
-  }
+onMounted(() => {
+  handleFetchSettings();
+  handleFetchConfigMap();
 });
 </script>
 <template>
