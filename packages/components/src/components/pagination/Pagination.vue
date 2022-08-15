@@ -1,28 +1,30 @@
 <script lang="ts" setup>
 import { UseOffsetPagination } from "@vueuse/components";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
-import { defineProps, ref, toRefs, watch } from "vue";
+import { ref, toRefs, watch } from "vue";
 
-const props = defineProps({
-  page: {
-    type: Number,
-    default: 1,
-  },
-  size: {
-    type: Number,
-    default: 10,
-  },
-  total: {
-    type: Number,
-    default: 0,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    page?: number;
+    size?: number;
+    total?: number;
+  }>(),
+  {
+    page: 1,
+    size: 10,
+    total: 0,
+  }
+);
 
 const { page, size, total } = toRefs(props);
 
 const key = ref(Math.random());
 
-const emit = defineEmits(["update:page", "update:size", "change"]);
+const emit = defineEmits<{
+  (event: "update:page", page: number): void;
+  (event: "update:size", size: number): void;
+  (event: "change", value: { page: number; size: number }): void;
+}>();
 
 const onPageChange = ({
   currentPage,

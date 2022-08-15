@@ -1,5 +1,4 @@
 <script lang="ts" name="UserEditingModal" setup>
-import type { PropType } from "vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Role, User } from "@halo-dev/api-client";
@@ -17,20 +16,23 @@ import { rbacAnnotations } from "@/constants/annotations";
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
-import { submitForm } from "@formkit/core";
+import { reset, submitForm } from "@formkit/core";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  user: {
-    type: Object as PropType<User | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    user: User | null;
+  }>(),
+  {
+    visible: false,
+    user: null,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 interface FormState {
   user: User;
@@ -103,6 +105,7 @@ watch(props, (newVal) => {
     return;
   }
   formState.value = cloneDeep(initialFormState);
+  reset("user-form");
 });
 
 const handleFetchRoles = async () => {

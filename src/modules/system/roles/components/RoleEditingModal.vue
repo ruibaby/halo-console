@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
-import type { PropType } from "vue";
 import { computed, ref, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
@@ -9,21 +8,24 @@ import {
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
-import { submitForm } from "@formkit/core";
+import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  role: {
-    type: Object as PropType<Role | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    role: Role | null;
+  }>(),
+  {
+    visible: false,
+    role: null,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
@@ -70,6 +72,7 @@ watch(props, (newVal) => {
   }
   formState.value = cloneDeep(initialFormState);
   selectedRoleTemplates.value.clear();
+  reset("role-form");
 });
 
 const tabActiveId = ref("general");
@@ -96,9 +99,9 @@ const handleVisibleChange = (visible: boolean) => {
 </script>
 <template>
   <VModal
+    :title="editingModalTitle"
     :visible="visible"
     :width="700"
-    :title="editingModalTitle"
     @update:visible="handleVisibleChange"
   >
     <VTabs v-model:active-id="tabActiveId" type="outline">

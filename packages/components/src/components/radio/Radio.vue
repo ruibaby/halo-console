@@ -1,22 +1,17 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-const props = defineProps({
-  modelValue: {
-    type: [String, Number, Boolean],
-  },
-  value: {
-    type: [String, Number, Boolean],
-  },
-  label: {
-    type: String,
-  },
-  name: {
-    type: String,
-  },
-});
+const props = defineProps<{
+  modelValue?: string | number | boolean;
+  value?: string | number | boolean;
+  label?: string;
+  name?: string;
+}>();
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string | number | boolean): void;
+  (event: "change", value: string | number | boolean): void;
+}>();
 
 const id = ["radio", props.name, props.value]
   .filter((item) => !!item)

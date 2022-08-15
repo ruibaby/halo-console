@@ -1,31 +1,25 @@
 <script lang="ts" setup>
 import { VCheckbox } from "./index";
-import type { PropType } from "vue";
 
-const props = defineProps({
-  modelValue: {
-    type: Object as PropType<Array<string>>,
-    default: () => {
-      return [];
-    },
-  },
-  options: {
-    type: Object as PropType<Array<Record<string, string>>>,
-  },
-  valueKey: {
-    type: String,
-    default: "value",
-  },
-  labelKey: {
-    type: String,
-    default: "label",
-  },
-  name: {
-    type: String,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string[];
+    options?: Array<Record<string, string>>;
+    valueKey?: string;
+    labelKey?: string;
+    name?: string;
+  }>(),
+  {
+    modelValue: () => [],
+    valueKey: "value",
+    labelKey: "label",
+  }
+);
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string[]): void;
+  (event: "change", value: string[]): void;
+}>();
 
 function handleChange(e: Event) {
   const { value, checked } = e.target as HTMLInputElement;

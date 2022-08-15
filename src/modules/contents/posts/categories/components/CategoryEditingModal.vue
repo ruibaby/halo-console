@@ -4,9 +4,11 @@ import { VButton, VModal, VSpace } from "@halo-dev/components";
 withDefaults(
   defineProps<{
     visible: boolean;
+    category: unknown | null;
   }>(),
   {
     visible: false,
+    category: undefined,
   }
 );
 
@@ -26,27 +28,25 @@ const onVisibleChange = (visible: boolean) => {
   <VModal
     :visible="visible"
     :width="600"
-    title="本地存储策略编辑"
+    title="编辑文章分类"
     @update:visible="onVisibleChange"
   >
-    <FormKit id="local-strategy-form" type="form">
+    <FormKit id="category-form" type="form">
       <FormKit label="名称" type="text" validation="required"></FormKit>
-      <FormKit label="存储位置" type="text" validation="required"></FormKit>
       <FormKit
-        help="使用半角逗号分隔"
-        label="允许上传的文件类型"
-        type="textarea"
-        value="jpg,png,gif"
+        help="通常作为分类访问地址标识"
+        label="别名"
+        type="text"
+        validation="required"
       ></FormKit>
+      <FormKit label="上级目录" type="select"></FormKit>
+      <FormKit help="需要主题适配以支持" label="封面图" type="text"></FormKit>
+      <FormKit help="需要主题适配以支持" label="描述" type="textarea"></FormKit>
     </FormKit>
-
     <template #footer>
       <VSpace>
-        <VButton
-          type="secondary"
-          @click="$formkit.submit('local-strategy-form')"
-        >
-          保存 ⌘ + ↵
+        <VButton type="secondary" @click="$formkit.submit('category-form')">
+          提交 ⌘ + ↵
         </VButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>

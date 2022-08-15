@@ -10,14 +10,19 @@ import AttachmentLocalStrategyEditingModal from "./AttachmentLocalStrategyEditin
 import AttachmentAliOSSStrategyEditingModal from "./AttachmentAliOSSStrategyEditingModal.vue";
 import { ref } from "vue";
 
-defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+  }>(),
+  {
+    visible: false,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const strategies = ref([
   {

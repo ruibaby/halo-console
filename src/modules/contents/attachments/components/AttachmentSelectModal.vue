@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { VButton, VCard, VModal } from "@halo-dev/components";
 
-defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+  }>(),
+  {
+    visible: false,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const attachments = Array.from(new Array(50), (_, index) => index).map(
   (index) => {

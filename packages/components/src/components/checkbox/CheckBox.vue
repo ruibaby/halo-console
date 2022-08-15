@@ -1,25 +1,24 @@
 <script lang="ts" setup>
-const props = defineProps({
-  checked: {
-    type: Boolean,
-    default: false,
-  },
-  value: {
-    type: [String, Number, Boolean],
-  },
-  label: {
-    type: String,
-  },
-  name: {
-    type: String,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    checked?: boolean;
+    value?: string | number | boolean;
+    label?: string;
+    name?: string;
+  }>(),
+  {
+    checked: false,
+  }
+);
 
 const id = ["checkbox", props.name, props.value]
   .filter((item) => !!item)
   .join("-");
 
-const emit = defineEmits(["update:checked", "change"]);
+const emit = defineEmits<{
+  (event: "update:checked", value: boolean): void;
+  (event: "change", value: Event): void;
+}>();
 
 function handleChange(e: Event) {
   const { checked } = e.target as HTMLInputElement;

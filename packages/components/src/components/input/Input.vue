@@ -1,26 +1,23 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { computed } from "vue";
 import type { Size } from "./interface";
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-  },
-  size: {
-    type: String as PropType<Size>,
-    default: "md",
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  placeholder: {
-    type: String,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string;
+    size?: Size;
+    disabled?: boolean;
+    placeholder?: string;
+  }>(),
+  {
+    size: "md",
+    disabled: false,
+  }
+);
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string): void;
+}>();
 
 const classes = computed(() => {
   return [`input-${props.size}`];

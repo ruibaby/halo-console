@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: boolean;
+  }>(),
+  {
+    modelValue: false,
+  }
+);
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: boolean): void;
+  (event: "change", value: boolean): void;
+}>();
 
 const handleChange = () => {
   emit("update:modelValue", !props.modelValue);

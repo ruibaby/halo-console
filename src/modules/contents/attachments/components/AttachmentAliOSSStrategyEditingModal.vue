@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { VAlert, VButton, VModal, VSpace } from "@halo-dev/components";
 
-defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+  }>(),
+  {
+    visible: false,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);

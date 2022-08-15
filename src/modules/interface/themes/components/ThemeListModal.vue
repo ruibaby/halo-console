@@ -9,27 +9,28 @@ import {
   VTag,
 } from "@halo-dev/components";
 import ThemeInstallModal from "./ThemeInstallModal.vue";
-import type { PropType } from "vue";
 import { onMounted, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 
-defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  selectedTheme: {
-    type: Object as PropType<Theme | null>,
-    default: null,
-  },
-  activatedTheme: {
-    type: Object as PropType<Theme | null>,
-    default: null,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+    selectedTheme: Theme | null;
+    activatedTheme: Theme | null;
+  }>(),
+  {
+    visible: false,
+    selectedTheme: null,
+    activatedTheme: null,
+  }
+);
 
-const emit = defineEmits(["update:visible", "close", "update:selectedTheme"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+  (event: "update:selectedTheme", theme: Theme | null): void;
+}>();
 
 const themes = ref<Theme[]>([]);
 const themeInstall = ref(false);
