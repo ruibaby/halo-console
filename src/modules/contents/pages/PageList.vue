@@ -6,17 +6,17 @@ import {
   IconSettings,
   VButton,
   VCard,
+  VEmpty,
   VPageHeader,
   VPagination,
   VSpace,
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
-import { apiClient } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
-import type { User } from "@halo-dev/api-client";
+import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
 const pagesRef = ref([
   {
@@ -39,29 +39,16 @@ const pagesRef = ref([
   },
 ]);
 
-const users = ref<User[]>([]);
-
 const activeId = ref("functional");
 const checkAll = ref(false);
+
+const { users } = useUserFetch();
 
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],
 });
 
 useExtensionPointsState("PAGES", pagesPublicState);
-
-const handleFetchUsers = async () => {
-  try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-onMounted(() => {
-  handleFetchUsers();
-});
 </script>
 <template>
   <VPageHeader title="页面">
@@ -92,7 +79,24 @@ onMounted(() => {
         ></VTabbar>
       </template>
       <div v-if="activeId === 'functional'">
+        <VEmpty
+          v-if="!pagesPublicState.functionalPages.length"
+          message="当前没有功能页面，功能页面通常由各个插件提供，你可以尝试安装新插件以获得支持"
+          title="当前没有功能页面"
+        >
+          <template #actions>
+            <VSpace>
+              <VButton :route="{ name: 'Plugins' }" type="primary">
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                安装插件
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
         <ul
+          v-else
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
