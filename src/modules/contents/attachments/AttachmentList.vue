@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  IconAddCircle,
   IconArrowDown,
   IconCheckboxFill,
   IconDatabase2Line,
@@ -20,6 +21,7 @@ import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentSelectModal from "./components/AttachmentSelectModal.vue";
 import AttachmentStrategiesModal from "./components/AttachmentStrategiesModal.vue";
+import AttachmentGroupEditingModal from "./components/AttachmentGroupEditingModal.vue";
 import { ref } from "vue";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
@@ -40,6 +42,7 @@ const strategyVisible = ref(false);
 const selectVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
+const groupEditingModal = ref(false);
 const checkAll = ref(false);
 
 const { users } = useUserFetch();
@@ -86,6 +89,7 @@ const folders = [
   <AttachmentUploadModal v-model:visible="uploadVisible" />
   <AttachmentSelectModal v-model:visible="selectVisible" />
   <AttachmentStrategiesModal v-model:visible="strategyVisible" />
+  <AttachmentGroupEditingModal v-model:visible="groupEditingModal" />
   <VPageHeader title="附件库">
     <template #icon>
       <IconPalette class="mr-2 self-center" />
@@ -156,16 +160,19 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">本地</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">阿里云 OSS</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">Amazon S3</span>
@@ -197,6 +204,7 @@ const folders = [
                               <li
                                 v-for="(user, index) in users"
                                 :key="index"
+                                v-close-popper
                                 class="cursor-pointer py-4 hover:bg-gray-50"
                               >
                                 <div class="flex items-center space-x-4">
@@ -246,11 +254,13 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">未被引用</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文章</span>
@@ -280,21 +290,25 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较近上传</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较晚上传</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小降序</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小升序</span>
@@ -326,21 +340,58 @@ const folders = [
           <div v-if="viewType === 'grid'">
             <div class="mb-5 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-6">
               <div
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                class="flex cursor-pointer items-center rounded-base bg-gray-200 p-2 text-gray-900 transition-all"
               >
                 <div class="flex flex-1 items-center">
-                  <span class="text-sm">全部</span>
+                  <span class="text-sm">全部（212）</span>
+                </div>
+              </div>
+              <div
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+              >
+                <div class="flex flex-1 items-center">
+                  <span class="text-sm">未分组（18）</span>
                 </div>
               </div>
               <div
                 v-for="(folder, index) in folders"
                 :key="index"
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
               >
                 <div class="flex flex-1 items-center">
-                  <span class="text-sm">{{ folder.name }}</span>
+                  <span class="text-sm">
+                    {{ folder.name }}（{{ index * 20 }}）
+                  </span>
                 </div>
-                <IconMore />
+                <FloatingDropdown>
+                  <IconMore />
+                  <template #popper>
+                    <div class="w-48 p-2">
+                      <VSpace class="w-full" direction="column">
+                        <VButton
+                          v-close-popper
+                          block
+                          type="secondary"
+                          @click="groupEditingModal = true"
+                        >
+                          重命名
+                        </VButton>
+                        <VButton v-close-popper block type="danger">
+                          删除
+                        </VButton>
+                      </VSpace>
+                    </div>
+                  </template>
+                </FloatingDropdown>
+              </div>
+              <div
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                @click="groupEditingModal = true"
+              >
+                <div class="flex flex-1 items-center">
+                  <span class="text-sm">添加分组</span>
+                </div>
+                <IconAddCircle />
               </div>
             </div>
             <div

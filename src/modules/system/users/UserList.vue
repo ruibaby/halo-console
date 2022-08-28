@@ -18,6 +18,7 @@ import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -167,11 +168,13 @@ onMounted(() => {
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">正常</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">已禁用</span>
@@ -193,21 +196,25 @@ onMounted(() => {
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">Super Administrator</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">Administrator</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">Editor</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">Guest</span>
@@ -229,11 +236,13 @@ onMounted(() => {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较近登录</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较晚登录</span>
@@ -313,8 +322,8 @@ onMounted(() => {
                       {{ role }}
                     </VTag>
                   </div>
-                  <time class="text-sm text-gray-500" datetime="2020-01-07">
-                    {{ user.metadata.creationTimestamp }}
+                  <time class="text-sm text-gray-500">
+                    {{ formatDatetime(user.metadata.creationTimestamp) }}
                   </time>
                   <span
                     v-permission="['system:users:manage']"
@@ -326,6 +335,7 @@ onMounted(() => {
                         <div class="w-48 p-2">
                           <VSpace class="w-full" direction="column">
                             <VButton
+                              v-close-popper
                               block
                               type="secondary"
                               @click="handleOpenCreateModal(user)"
@@ -333,6 +343,7 @@ onMounted(() => {
                               修改资料
                             </VButton>
                             <VButton
+                              v-close-popper
                               block
                               @click="handleOpenPasswordChangeModal(user)"
                             >
