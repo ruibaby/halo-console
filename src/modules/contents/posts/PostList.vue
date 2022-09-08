@@ -16,15 +16,14 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
-  VTag,
 } from "@halo-dev/components";
+import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { onMounted, ref, watch, watchEffect } from "vue";
 import type { ListedPostList, Post, PostRequest } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { formatDatetime } from "@/utils/date";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import cloneDeep from "lodash.clonedeep";
@@ -53,9 +52,8 @@ const selectedPostWithContent = ref<PostRequest | null>(null);
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
-const { users } = useUserFetch();
-const { categories } = usePostCategory();
-const { tags } = usePostTag();
+const { categories } = usePostCategory({ fetchOnMounted: true });
+const { tags } = usePostTag({ fetchOnMounted: true });
 const dialog = useDialog();
 
 const handleFetchPosts = async () => {
@@ -76,11 +74,11 @@ const handleFetchPosts = async () => {
       );
     }
 
-    const { data } = await apiClient.post.listPosts(
-      posts.value.page,
-      posts.value.size,
-      labelSelector
-    );
+    const { data } = await apiClient.post.listPosts({
+      page: posts.value.page,
+      size: posts.value.size,
+      labelSelector,
+    });
     posts.value = data;
   } catch (e) {
     console.error("Failed to fetch posts", e);
@@ -103,7 +101,9 @@ const handlePaginationChange = ({
 
 const handleOpenSettingModal = async (post: Post) => {
   const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-    post.metadata.name
+    {
+      name: post.metadata.name,
+    }
   );
   selectedPost.value = data;
   settingModal.value = true;
@@ -122,9 +122,9 @@ const handleSelectPrevious = async () => {
   );
   if (index > 0) {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        items[index - 1].post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: items[index - 1].post.metadata.name,
+      });
     selectedPost.value = data;
     return;
   }
@@ -142,9 +142,9 @@ const handleSelectNext = async () => {
   );
   if (index < items.length - 1) {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        items[index + 1].post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: items[index + 1].post.metadata.name,
+      });
     selectedPost.value = data;
     return;
   }
@@ -189,10 +189,10 @@ const handleDelete = async (post: Post) => {
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = true;
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
-        postToUpdate.metadata.name,
-        postToUpdate
-      );
+      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+        name: postToUpdate.metadata.name,
+        post: postToUpdate,
+      });
       await handleFetchPosts();
     },
   });
@@ -207,9 +207,9 @@ watchEffect(async () => {
     return;
   }
 
-  const { data: content } = await apiClient.content.obtainSnapshotContent(
-    selectedPost.value.spec.headSnapshot
-  );
+  const { data: content } = await apiClient.content.obtainSnapshotContent({
+    snapshotName: selectedPost.value.spec.headSnapshot,
+  });
 
   selectedPostWithContent.value = {
     post: selectedPost.value,
@@ -523,7 +523,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                     </div>
                   </template>
                 </FloatingDropdown>
-                <FloatingDropdown>
+                <UserDropdownSelector>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -532,51 +532,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                       <IconArrowDown />
                     </span>
                   </div>
-                  <template #popper>
-                    <div class="h-96 w-80">
-                      <div class="bg-white p-4">
-                        <!--TODO: Auto Focus-->
-                        <FormKit
-                          placeholder="输入关键词搜索"
-                          type="text"
-                        ></FormKit>
-                      </div>
-                      <div class="mt-2">
-                        <ul class="divide-y divide-gray-200" role="list">
-                          <li
-                            v-for="(user, index) in users"
-                            :key="index"
-                            v-close-popper
-                            class="cursor-pointer hover:bg-gray-50"
-                          >
-                            <div class="flex items-center space-x-4 px-4 py-3">
-                              <div class="flex-shrink-0">
-                                <img
-                                  :alt="user.spec.displayName"
-                                  :src="user.spec.avatar"
-                                  class="h-10 w-10 rounded"
-                                />
-                              </div>
-                              <div class="min-w-0 flex-1">
-                                <p
-                                  class="truncate text-sm font-medium text-gray-900"
-                                >
-                                  {{ user.spec.displayName }}
-                                </p>
-                                <p class="truncate text-sm text-gray-500">
-                                  @{{ user.metadata.name }}
-                                </p>
-                              </div>
-                              <div>
-                                <VTag>{{ index + 1 }} 篇</VTag>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </template>
-                </FloatingDropdown>
+                </UserDropdownSelector>
                 <FloatingDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"

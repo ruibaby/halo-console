@@ -14,7 +14,11 @@ interface usePostCategoryReturn {
   handleDelete: (category: CategoryTree) => void;
 }
 
-export function usePostCategory(): usePostCategoryReturn {
+export function usePostCategory(options?: {
+  fetchOnMounted: boolean;
+}): usePostCategoryReturn {
+  const { fetchOnMounted } = options || {};
+
   const categories = ref<Category[]>([] as Category[]);
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
   const loading = ref(false);
@@ -25,10 +29,10 @@ export function usePostCategory(): usePostCategoryReturn {
     try {
       loading.value = true;
       const { data } =
-        await apiClient.extension.category.listcontentHaloRunV1alpha1Category(
-          0,
-          0
-        );
+        await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
+          page: 0,
+          size: 0,
+        });
       categories.value = data.items;
       categoriesTree.value = buildCategoriesTree(data.items);
     } catch (e) {
@@ -46,7 +50,9 @@ export function usePostCategory(): usePostCategoryReturn {
       onConfirm: async () => {
         try {
           await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(
-            category.metadata.name
+            {
+              name: category.metadata.name,
+            }
           );
         } catch (e) {
           console.error("Failed to delete tag", e);
@@ -57,7 +63,9 @@ export function usePostCategory(): usePostCategoryReturn {
     });
   };
 
-  onMounted(handleFetchCategories);
+  onMounted(() => {
+    fetchOnMounted && handleFetchCategories();
+  });
 
   return {
     categories,

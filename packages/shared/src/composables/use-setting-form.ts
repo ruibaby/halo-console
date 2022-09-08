@@ -6,8 +6,10 @@ import { apiClient } from "../utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
+import merge from "lodash.merge";
 import type { FormKitSetting, FormKitSettingSpec } from "../types/formkit";
 import type { ConfigMap } from "@halo-dev/api-client";
+import type { FormKitSchemaNode } from "@formkit/core";
 
 const initialConfigMap: ConfigMap = {
   apiVersion: "v1alpha1",
@@ -38,6 +40,7 @@ export function useSettingForm(
   const configMapFormData = ref<
     Record<string, Record<string, string>> | undefined
   >();
+
   const saving = ref(false);
 
   const handleFetchSettings = async () => {
@@ -46,10 +49,31 @@ export function useSettingForm(
       return;
     }
     try {
-      const response = await apiClient.extension.setting.getv1alpha1Setting(
-        settingName.value
-      );
+      const response = await apiClient.extension.setting.getv1alpha1Setting({
+        name: settingName.value,
+      });
       settings.value = response.data as FormKitSetting;
+
+      // init configMapFormData
+      if (!configMapFormData.value) {
+        const { spec: schemaGroups } = settings.value;
+        const initialConfigMapFormData: Record<
+          string,
+          Record<string, string>
+        > = {};
+        schemaGroups.forEach((schemaGroup) => {
+          initialConfigMapFormData[schemaGroup.group] = {};
+          const formSchema = schemaGroup.formSchema as FormKitSchemaNode[];
+          formSchema.forEach((schema) => {
+            // @ts-ignore
+            if ("name" in schema && "$formkit" in schema) {
+              initialConfigMapFormData[schemaGroup.group][schema.name] =
+                schema.value || undefined;
+            }
+          });
+        });
+        configMapFormData.value = cloneDeep(initialConfigMapFormData);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -63,29 +87,31 @@ export function useSettingForm(
     }
     try {
       const response = await apiClient.extension.configMap.getv1alpha1ConfigMap(
-        configMapName.value
+        {
+          name: configMapName.value,
+        }
       );
+
       configMap.value = response.data;
 
       const { data } = configMap.value;
 
       if (data) {
-        configMapFormData.value = Object.keys(data).reduce((acc, key) => {
-          // @ts-ignore
-          acc[key] = JSON.parse(data[key]);
-          return acc;
-        }, {});
+        // merge objects value
+        const { spec: schemaGroups } = settings.value || {};
+
+        schemaGroups?.forEach((schemaGroup) => {
+          if (!configMapFormData.value) {
+            return;
+          }
+          configMapFormData.value[schemaGroup.group] = merge(
+            configMapFormData.value[schemaGroup.group] || {},
+            JSON.parse(data[schemaGroup.group] || "{}")
+          );
+        });
       }
     } catch (e) {
       console.error(e);
-    } finally {
-      if (!configMapFormData.value) {
-        configMapFormData.value = settings.value?.spec.reduce((acc, item) => {
-          // @ts-ignore
-          acc[item.group] = {};
-          return acc;
-        }, {});
-      }
     }
   };
 
@@ -105,14 +131,14 @@ export function useSettingForm(
       });
 
       if (!configMap.value.metadata.creationTimestamp) {
-        await apiClient.extension.configMap.createv1alpha1ConfigMap(
-          configMap.value
-        );
+        await apiClient.extension.configMap.createv1alpha1ConfigMap({
+          configMap: configMap.value,
+        });
       } else {
-        await apiClient.extension.configMap.updatev1alpha1ConfigMap(
-          configMap.value.metadata.name,
-          configMap.value
-        );
+        await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+          configMap: configMap.value,
+          name: configMap.value.metadata.name,
+        });
       }
     } catch (e) {
       console.error(e);

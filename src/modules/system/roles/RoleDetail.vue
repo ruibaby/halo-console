@@ -28,7 +28,7 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
 
-const { users } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
 
 watch(
   () => selectedRoleTemplates.value,
@@ -42,9 +42,9 @@ watch(
 
 const handleFetchRole = async () => {
   try {
-    const response = await apiClient.extension.role.getv1alpha1Role(
-      route.params.name as string
-    );
+    const response = await apiClient.extension.role.getv1alpha1Role({
+      name: route.params.name as string,
+    });
     formState.value = response.data;
     selectedRoleTemplates.value = new Set(
       JSON.parse(
