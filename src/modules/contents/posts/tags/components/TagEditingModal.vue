@@ -18,6 +18,7 @@ import type { Tag } from "@halo-dev/api-client";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import { reset, submitForm } from "@formkit/core";
+import { setFocus } from "@/formkit/utils/focus";
 import { useMagicKeys } from "@vueuse/core";
 import { v4 as uuid } from "uuid";
 
@@ -109,7 +110,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -134,15 +137,21 @@ watch(
     @update:visible="onVisibleChange"
   >
     <template #actions>
-      <div class="modal-header-action" @click="emit('previous')">
+      <span @click="emit('previous')">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="emit('next')">
+      </span>
+      <span @click="emit('next')">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
-    <FormKit id="tag-form" type="form" @submit="handleSaveTag">
+    <FormKit
+      id="tag-form"
+      :config="{ validationVisibility: 'submit' }"
+      type="form"
+      @submit="handleSaveTag"
+    >
       <FormKit
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"

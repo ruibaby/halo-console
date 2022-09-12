@@ -15,6 +15,7 @@ import {
   VSpace,
   useDialog,
   VEmpty,
+  VAvatar,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -57,7 +58,7 @@ const checkAll = ref(false);
 const handleFetchSinglePages = async () => {
   try {
     loading.value = true;
-    const { data } = await apiClient.post.listSinglePages({
+    const { data } = await apiClient.singlePage.listSinglePages({
       page: singlePages.value.page,
       size: singlePages.value.size,
     });
@@ -200,12 +201,12 @@ const handleSelectUser = (user?: User) => {
     @close="onSettingModalClose"
   >
     <template #actions>
-      <div class="modal-header-action" @click="handleSelectPrevious">
+      <span @click="handleSelectPrevious">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="handleSelectNext">
+      </span>
+      <span @click="handleSelectNext">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
   </SinglePageSettingModal>
   <VCard :body-class="['!p-0']" class="rounded-none border-none shadow-none">
@@ -357,9 +358,7 @@ const handleSelectUser = (user?: User) => {
                     query: { name: singlePage.page.metadata.name },
                   }"
                 >
-                  <span
-                    class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                  >
+                  <span class="truncate text-sm font-medium text-gray-900">
                     {{ singlePage.page.spec.title }}
                   </span>
                 </RouterLink>
@@ -404,14 +403,15 @@ const handleSelectUser = (user?: User) => {
                     name: 'UserDetail',
                     params: { name: contributor.name },
                   }"
+                  class="flex items-center"
                 >
-                  <img
+                  <VAvatar
                     v-tooltip="contributor.displayName"
-                    :alt="contributor.name"
+                    size="xs"
                     :src="contributor.avatar"
-                    :title="contributor.displayName"
-                    class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                  />
+                    :alt="contributor.displayName"
+                    circle
+                  ></VAvatar>
                 </RouterLink>
                 <span class="text-sm text-gray-500">
                   {{ finalStatus(singlePage.page) }}
