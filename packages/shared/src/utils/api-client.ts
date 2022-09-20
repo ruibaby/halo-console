@@ -1,10 +1,12 @@
 import {
-  ApiHaloRunV1alpha1ContentApi,
-  ApiHaloRunV1alpha1PluginApi,
-  ApiHaloRunV1alpha1PostApi,
-  ApiHaloRunV1alpha1SinglePageApi,
-  ApiHaloRunV1alpha1ThemeApi,
-  ApiHaloRunV1alpha1UserApi,
+  ApiConsoleHaloRunV1alpha1ContentApi,
+  ApiConsoleHaloRunV1alpha1PluginApi,
+  ApiConsoleHaloRunV1alpha1PostApi,
+  ApiConsoleHaloRunV1alpha1SinglePageApi,
+  ApiConsoleHaloRunV1alpha1ThemeApi,
+  ApiConsoleHaloRunV1alpha1UserApi,
+  ApiConsoleHaloRunV1alpha1CommentApi,
+  ApiConsoleHaloRunV1alpha1ReplyApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -106,12 +108,18 @@ function setupApiClient(axios: AxiosInstance) {
       },
     },
     // custom endpoints
-    user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
-    plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
-    theme: new ApiHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
-    post: new ApiHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
-    singlePage: new ApiHaloRunV1alpha1SinglePageApi(undefined, apiUrl, axios),
-    content: new ApiHaloRunV1alpha1ContentApi(undefined, apiUrl, axios),
+    user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
+    plugin: new ApiConsoleHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
+    theme: new ApiConsoleHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
+    post: new ApiConsoleHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
+    singlePage: new ApiConsoleHaloRunV1alpha1SinglePageApi(
+      undefined,
+      apiUrl,
+      axios
+    ),
+    content: new ApiConsoleHaloRunV1alpha1ContentApi(undefined, apiUrl, axios),
+    comment: new ApiConsoleHaloRunV1alpha1CommentApi(undefined, apiUrl, axios),
+    reply: new ApiConsoleHaloRunV1alpha1ReplyApi(undefined, apiUrl, axios),
   };
 }
 
