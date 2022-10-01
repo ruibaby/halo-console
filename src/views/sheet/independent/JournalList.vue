@@ -49,10 +49,16 @@
                       <a-icon type="message" />
                       {{ item.commentCount }}
                     </a-button>
-                    <a-button v-if="item.type === 'INTIMATE'" class="!p-0" disabled type="link">
+                    <a-button
+                      v-if="item.type === 'INTIMATE'"
+                      class="!p-0"
+                      type="link"
+                      @click="handleJournalTypeUpdate(item)"
+                      style="color: grey"
+                    >
                       <a-icon type="lock" />
                     </a-button>
-                    <a-button v-else class="!p-0" type="link">
+                    <a-button v-else class="!p-0" type="link" @click="handleJournalTypeUpdate(item)">
                       <a-icon type="unlock" />
                     </a-button>
                   </template>
@@ -229,7 +235,7 @@ export default {
       },
       optionModal: {
         visible: false,
-        options: []
+        options: {}
       }
     }
   },
@@ -282,7 +288,7 @@ export default {
       }
     },
     handleListOptions() {
-      apiClient.option.list().then(response => {
+      apiClient.option.listAsMapViewByKeys(['journals_page_size', 'journals_title']).then(response => {
         this.optionModal.options = response.data
       })
     },
@@ -321,6 +327,18 @@ export default {
       this.form.model.content = renderContent
     },
 
+    handleJournalTypeUpdate(item) {
+      this.form.model = deepClone(item)
+      this.form.model.type = item.type === 'PUBLIC' ? 'INTIMATE' : 'PUBLIC'
+      apiClient.journal
+        .update(this.form.model.id, this.form.model)
+        .catch(e => {
+          this.$log.error(e)
+        })
+        .finally(() => {
+          this.handleListJournals()
+        })
+    },
     handleSaveOrUpdate() {
       const _this = this
       _this.$refs.journalForm.validate(valid => {
@@ -391,7 +409,7 @@ export default {
 
     handleSaveOptions() {
       apiClient.option
-        .save(this.optionModal.options)
+        .saveMapView(this.optionModal.options)
         .then(() => {
           this.$message.success('保存成功！')
           this.optionModal.visible = false
