@@ -6,9 +6,11 @@ import { computed, useAttrs, watchEffect } from "vue";
 const props = withDefaults(
   defineProps<{
     text?: string;
+    loading?: boolean;
   }>(),
   {
     text: "提交",
+    loading: false,
   }
 );
 
@@ -34,7 +36,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <VButton v-bind="attrs" @click="emit('submit')">
+  <VButton v-bind="attrs" :loading="loading" @click="emit('submit')">
     {{ buttonText }}
   </VButton>
 </template>
