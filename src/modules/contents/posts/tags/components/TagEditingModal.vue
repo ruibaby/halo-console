@@ -4,15 +4,7 @@ import { computed, nextTick, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  Toast,
-  VButton,
-  VModal,
-  VSpace,
-} from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
+import { Toast } from "@halo-dev/components";
 
 // types
 import type { Tag } from "@halo-dev/api-client";

@@ -3,15 +3,7 @@
 import { onMounted, ref, watch } from "vue";
 
 // components
-import {
-  Dialog,
-  IconAddCircle,
-  IconMore,
-  Toast,
-  VButton,
-  VSpace,
-  VStatusDot,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 
 // types

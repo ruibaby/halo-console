@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VModal, IconLink } from "@halo-dev/components";
-
 withDefaults(
   defineProps<{
     visible: boolean;

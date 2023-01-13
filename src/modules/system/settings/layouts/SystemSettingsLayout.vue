@@ -7,15 +7,6 @@ import { useRoute, useRouter } from "vue-router";
 // types
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { useSettingForm } from "@/composables/use-setting-form";
-
-// components
-import {
-  VCard,
-  VPageHeader,
-  VTabbar,
-  IconSettings,
-  VLoading,
-} from "@halo-dev/components";
 import type { SettingForm } from "@halo-dev/api-client";
 
 interface SettingTab {

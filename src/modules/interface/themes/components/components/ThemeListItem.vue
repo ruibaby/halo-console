@@ -1,16 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconGitHub,
-  VButton,
-  VSpace,
-  VTag,
-  VEntity,
-  VEntityField,
-  VStatusDot,
-  Dialog,
-  Toast,
-} from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
+import { Dialog, Toast } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { toRefs } from "vue";

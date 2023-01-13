@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VCard, IconPages } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { singlePageLabels } from "@/constants/labels";

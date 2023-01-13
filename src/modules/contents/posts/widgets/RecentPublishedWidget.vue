@@ -1,11 +1,4 @@
 <script lang="ts" setup>
-import {
-  VCard,
-  VSpace,
-  VEntity,
-  VEntityField,
-  IconExternalLinkLine,
-} from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";

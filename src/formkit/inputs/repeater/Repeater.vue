@@ -1,11 +1,4 @@
 <script lang="ts" setup>
-import {
-  VButton,
-  IconAddCircle,
-  IconCloseCircle,
-  IconArrowUpCircleLine,
-  IconArrowDownCircleLine,
-} from "@halo-dev/components";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { PropType } from "vue";
 import cloneDeep from "lodash.clonedeep";

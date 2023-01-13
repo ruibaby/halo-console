@@ -11,14 +11,6 @@ import cloneDeep from "lodash.clonedeep";
 import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
-import {
-  VButton,
-  VCard,
-  VPageHeader,
-  VTabbar,
-  VAvatar,
-  VLoading,
-} from "@halo-dev/components";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 
 // types

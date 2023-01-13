@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { IconUserSettings, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { useRouter } from "vue-router";

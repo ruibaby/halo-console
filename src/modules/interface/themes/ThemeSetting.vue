@@ -2,9 +2,6 @@
 // core libs
 import { computed, inject, watch } from "vue";
 
-// components
-import { VButton } from "@halo-dev/components";
-
 // types
 import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";

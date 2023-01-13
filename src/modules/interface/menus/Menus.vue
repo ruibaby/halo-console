@@ -1,16 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconListSettings,
-  Dialog,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VSpace,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";

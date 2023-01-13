@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Toast, VModal } from "@halo-dev/components";
+import { Toast } from "@halo-dev/components";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useUserStore } from "@/stores/user";
 

@@ -1,19 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconGitHub,
-  VButton,
-  VEmpty,
-  VModal,
-  VSpace,
-  VEntity,
-  VEntityField,
-  VTabItem,
-  VTabs,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
+import { Toast } from "@halo-dev/components";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import ThemeListItem from "./components/ThemeListItem.vue";

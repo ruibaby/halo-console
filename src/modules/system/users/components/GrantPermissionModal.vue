@@ -3,8 +3,6 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
 import type { FormKitOptionsList } from "@formkit/inputs";
 import type { User } from "@halo-dev/api-client";
-import { VModal, VSpace, VButton } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref } from "vue";
 import { useFetchRole } from "../../roles/composables/use-role";
 

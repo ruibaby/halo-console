@@ -1,16 +1,5 @@
 <script lang="ts" setup>
-import {
-  VButton,
-  VSpace,
-  VSwitch,
-  VTag,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VAvatar,
-  Dialog,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
 import { ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";

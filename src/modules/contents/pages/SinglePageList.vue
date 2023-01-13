@@ -1,31 +1,6 @@
 <script lang="ts" setup>
-import {
-  IconArrowDown,
-  IconArrowLeft,
-  IconArrowRight,
-  IconEye,
-  IconEyeOff,
-  IconTeam,
-  IconAddCircle,
-  IconRefreshLine,
-  IconExternalLinkLine,
-  IconPages,
-  VButton,
-  VCard,
-  VPagination,
-  VSpace,
-  Dialog,
-  VEmpty,
-  VAvatar,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-  VPageHeader,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import type {
   ListedSinglePageList,
@@ -38,8 +13,6 @@ import { onBeforeRouteLeave, RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();

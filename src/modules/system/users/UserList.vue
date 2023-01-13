@@ -1,23 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconArrowDown,
-  IconUserFollow,
-  IconUserSettings,
-  VButton,
-  VCard,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  VTag,
-  VAvatar,
-  VEntity,
-  VEntityField,
-  Dialog,
-  VStatusDot,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";

@@ -1,20 +1,6 @@
 <script lang="ts" setup>
-import {
-  IconArrowDown,
-  IconMessage,
-  VButton,
-  VCard,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  IconRefreshLine,
-  VEmpty,
-  Dialog,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import type {
   ListedComment,
   ListedCommentList,
@@ -23,8 +9,6 @@ import type {
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { onBeforeRouteLeave } from "vue-router";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 
 const comments = ref<ListedCommentList>({

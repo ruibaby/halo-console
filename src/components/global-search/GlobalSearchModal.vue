@@ -1,9 +1,6 @@
 <script lang="ts" setup>
 import { useRoute, useRouter, type RouteLocationRaw } from "vue-router";
 import {
-  VModal,
-  VEntity,
-  VEntityField,
   IconLink,
   IconBookRead,
   IconFolder,

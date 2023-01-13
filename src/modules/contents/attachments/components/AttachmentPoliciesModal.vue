@@ -1,16 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  VButton,
-  VModal,
-  VSpace,
-  VEmpty,
-  Dialog,
-  VEntity,
-  VEntityField,
-  VStatusDot,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";

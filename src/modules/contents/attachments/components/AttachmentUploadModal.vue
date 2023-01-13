@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VModal, IconAddCircle, VAlert } from "@halo-dev/components";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import {

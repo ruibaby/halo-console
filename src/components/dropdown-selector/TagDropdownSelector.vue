@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Tag } from "@halo-dev/api-client";
-import { VEntity, VEntityField } from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";

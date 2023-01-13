@@ -1,31 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconArrowDown,
-  IconArrowLeft,
-  IconArrowRight,
-  IconBookRead,
-  IconEye,
-  IconEyeOff,
-  IconTeam,
-  IconRefreshLine,
-  IconExternalLinkLine,
-  Dialog,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  VAvatar,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
+import { Dialog, Toast } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { computed, onMounted, ref, watch } from "vue";
@@ -41,10 +15,7 @@ import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
 import { postLabels } from "@/constants/labels";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
-import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -567,7 +538,7 @@ const hasFilters = computed(() => {
                   排序：{{ selectedSortItem.label }}
                 </FilterTag>
 
-                <FilteCleanButton
+                <FilterCleanButton
                   v-if="hasFilters"
                   @click="handleClearFilters"
                 />

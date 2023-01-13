@@ -1,15 +1,5 @@
 <script lang="ts" setup>
-import {
-  VAvatar,
-  VButton,
-  VTag,
-  VEntityField,
-  VEntity,
-  Dialog,
-  VStatusDot,
-  IconReplyLine,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import type { ListedReply } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { apiClient } from "@/utils/api-client";

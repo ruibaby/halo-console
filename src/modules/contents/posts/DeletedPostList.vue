@@ -1,22 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconDeleteBin,
-  IconRefreshLine,
-  Dialog,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  VAvatar,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
 import { onMounted, ref, watch } from "vue";
 import type { ListedPostList, Post } from "@halo-dev/api-client";
@@ -26,7 +9,6 @@ import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { getNode } from "@formkit/core";
-import FilterTag from "@/components/filter/FilterTag.vue";
 
 const { currentUserHasPermission } = usePermission();
 

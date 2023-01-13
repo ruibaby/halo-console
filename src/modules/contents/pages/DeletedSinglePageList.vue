@@ -1,22 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconRefreshLine,
-  IconDeleteBin,
-  VButton,
-  VCard,
-  VPagination,
-  VSpace,
-  Dialog,
-  VEmpty,
-  VAvatar,
-  VEntity,
-  VEntityField,
-  VPageHeader,
-  VStatusDot,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import { onMounted, ref, watch } from "vue";
 import type { ListedSinglePageList, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
@@ -25,7 +8,6 @@ import { onBeforeRouteLeave, RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { getNode } from "@formkit/core";
-import FilterTag from "@/components/filter/FilterTag.vue";
 
 const { currentUserHasPermission } = usePermission();
 

@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";

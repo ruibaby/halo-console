@@ -14,18 +14,6 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
-import {
-  IconExchange,
-  IconEye,
-  IconPalette,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VSpace,
-  VTabbar,
-  VLoading,
-} from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
 import type { SettingForm, Theme } from "@halo-dev/api-client";

@@ -7,6 +7,7 @@ import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
+import Components from "unplugin-vue-components/vite";
 
 export const sharedPlugins = [
   Vue(),
@@ -28,6 +29,22 @@ export const sharedPlugins = [
       theme_color: "#fff",
     },
     disable: true,
+  }),
+  Components({
+    dts: "src/components.d.ts",
+    resolvers: [
+      {
+        type: "component",
+        resolve: (name) => {
+          if (name.startsWith("V") || name.startsWith("Icon")) {
+            return {
+              name,
+              from: "@halo-dev/components",
+            };
+          }
+        },
+      },
+    ],
   }),
 ];
 

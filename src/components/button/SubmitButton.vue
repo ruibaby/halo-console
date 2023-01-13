@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VButton } from "@halo-dev/components";
 import { useMagicKeys } from "@vueuse/core";
 import { computed, useAttrs, watchEffect } from "vue";
 

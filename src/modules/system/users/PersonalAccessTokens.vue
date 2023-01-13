@@ -1,14 +1,4 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconDeleteBin,
-  IconStopCircle,
-  VButton,
-  VModal,
-  VSpace,
-  VTabItem,
-  VTabs,
-} from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";

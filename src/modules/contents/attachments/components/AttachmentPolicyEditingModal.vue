@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { computed, ref, watch, watchEffect } from "vue";

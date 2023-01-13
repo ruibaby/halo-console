@@ -1,15 +1,4 @@
 <script lang="ts" setup>
-import {
-  IconArrowRight,
-  IconShieldUser,
-  VButton,
-  VCard,
-  VPageHeader,
-  VTabbar,
-  VTag,
-  VAvatar,
-  VAlert,
-} from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";

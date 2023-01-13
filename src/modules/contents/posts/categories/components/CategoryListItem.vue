@@ -1,11 +1,4 @@
 <script lang="ts" setup>
-import {
-  IconList,
-  VButton,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-} from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
 import { ref } from "vue";

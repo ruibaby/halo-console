@@ -1,17 +1,5 @@
 <script lang="ts" setup>
-import {
-  Dialog,
-  VButton,
-  VCard,
-  VEmpty,
-  VSpace,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VTag,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, onUnmounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";

@@ -3,21 +3,7 @@
 import { onMounted, ref } from "vue";
 
 // components
-import {
-  IconAddCircle,
-  IconBookRead,
-  IconGrid,
-  IconList,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VSpace,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-} from "@halo-dev/components";
+import { IconGrid, IconList } from "@halo-dev/components";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import PostTag from "./components/PostTag.vue";
 

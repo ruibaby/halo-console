@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VCard, IconUserSettings } from "@halo-dev/components";
 import { inject, type Ref } from "vue";
 import type { DashboardStats } from "@halo-dev/api-client";
 

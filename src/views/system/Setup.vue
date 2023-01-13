@@ -3,7 +3,7 @@ import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { useSystemStatesStore } from "@/stores/system-states";
 import { apiClient } from "@/utils/api-client";
-import { Toast, VButton } from "@halo-dev/components";
+import { Toast } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import category from "./setup-data/category.json";

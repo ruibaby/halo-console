@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTag } from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment, Policy } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
 import { ref, watch, watchEffect } from "vue";

@@ -1,13 +1,6 @@
 <script lang="ts" setup>
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
-import {
-  IconUpload,
-  VButton,
-  VSpace,
-  VTabbar,
-  VAvatar,
-} from "@halo-dev/components";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";

@@ -1,18 +1,5 @@
 <script lang="ts" setup>
-import {
-  Dialog,
-  VAvatar,
-  VButton,
-  VEntity,
-  VEntityField,
-  VStatusDot,
-  VSpace,
-  VEmpty,
-  IconAddCircle,
-  IconExternalLinkLine,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import type {
   Extension,

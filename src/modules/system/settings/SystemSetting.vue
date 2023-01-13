@@ -2,9 +2,6 @@
 // core libs
 import { computed, ref } from "vue";
 
-// components
-import { VButton } from "@halo-dev/components";
-
 // hooks
 import { useSettingForm } from "@/composables/use-setting-form";
 import { useRouteParams } from "@vueuse/router";

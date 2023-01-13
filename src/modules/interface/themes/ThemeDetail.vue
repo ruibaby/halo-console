@@ -1,20 +1,10 @@
 <script lang="ts" setup>
 // core libs
 import { inject, ref } from "vue";
-import { RouterLink } from "vue-router";
 import { useThemeLifeCycle } from "./composables/use-theme";
 
 // components
-import {
-  VAlert,
-  VSpace,
-  VTag,
-  IconMore,
-  VButton,
-  Dialog,
-  VAvatar,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
 // types

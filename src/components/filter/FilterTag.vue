@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { IconCloseCircle } from "@halo-dev/components";
-
 const emit = defineEmits<{
   (event: "close"): void;
 }>();

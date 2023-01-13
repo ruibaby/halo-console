@@ -4,16 +4,6 @@ import { ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
-import {
-  IconAddCircle,
-  IconBookRead,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VSpace,
-  VLoading,
-} from "@halo-dev/components";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 

@@ -6,7 +6,6 @@ import {
   IconMotionLine,
   Toast,
 } from "@halo-dev/components";
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import type {
   ListedComment,
   ListedReply,

@@ -6,9 +6,6 @@ import { computed, ref } from "vue";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";
 
-// components
-import { VButton } from "@halo-dev/components";
-
 // types
 import type { Plugin } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";

@@ -1,17 +1,4 @@
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconArrowDown,
-  IconPlug,
-  IconRefreshLine,
-  VButton,
-  VCard,
-  VEmpty,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  VLoading,
-} from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
 import { computed, onMounted, ref } from "vue";
@@ -19,8 +6,6 @@ import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
@@ -241,7 +226,10 @@ function handleClearFilters() {
                 排序：{{ selectedSortItem.label }}
               </FilterTag>
 
-              <FilteCleanButton v-if="hasFilters" @click="handleClearFilters" />
+              <FilterCleanButton
+                v-if="hasFilters"
+                @click="handleClearFilters"
+              />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">

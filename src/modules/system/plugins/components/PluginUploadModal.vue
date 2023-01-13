@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VModal, Dialog } from "@halo-dev/components";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";

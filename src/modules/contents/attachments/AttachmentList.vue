@@ -1,29 +1,5 @@
 <script lang="ts" setup>
-import {
-  IconArrowDown,
-  IconArrowLeft,
-  IconArrowRight,
-  IconCheckboxFill,
-  IconDatabase2Line,
-  IconGrid,
-  IconList,
-  IconUpload,
-  IconRefreshLine,
-  VButton,
-  VCard,
-  VPageHeader,
-  VPagination,
-  VSpace,
-  VEmpty,
-  IconFolder,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
+import { IconGrid, IconList, Toast } from "@halo-dev/components";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
@@ -41,8 +17,6 @@ import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
@@ -391,7 +365,7 @@ onMounted(() => {
                       排序：{{ selectedSortItem.label }}
                     </FilterTag>
 
-                    <FilteCleanButton
+                    <FilterCleanButton
                       v-if="hasFilters"
                       @click="handleClearFilters"
                     />

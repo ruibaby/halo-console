@@ -1,12 +1,4 @@
 <script lang="ts" setup>
-import {
-  IconList,
-  VButton,
-  VTag,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-} from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";

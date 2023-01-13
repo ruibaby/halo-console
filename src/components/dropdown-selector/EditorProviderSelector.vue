@@ -3,7 +3,6 @@ import {
   useEditorExtensionPoints,
   type EditorProvider,
 } from "@/composables/use-editor-extension-points";
-import { VAvatar, VSpace, IconExchange } from "@halo-dev/components";
 
 withDefaults(
   defineProps<{

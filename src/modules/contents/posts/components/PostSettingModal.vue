@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { Toast } from "@halo-dev/components";
 import { computed, nextTick, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";

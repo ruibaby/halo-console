@@ -102,18 +102,6 @@
   </VModal>
 </template>
 <script lang="ts" setup>
-import {
-  IconAddCircle,
-  IconCloseCircle,
-  IconDashboard,
-  IconSave,
-  IconSettings,
-  VButton,
-  VModal,
-  VPageHeader,
-  VSpace,
-  VTabbar,
-} from "@halo-dev/components";
 import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";

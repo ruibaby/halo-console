@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VSwitch, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject, ref, watchEffect } from "vue";
 import { apiClient } from "@/utils/api-client";

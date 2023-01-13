@@ -4,22 +4,7 @@ import { computed, ref, watch } from "vue";
 import type { Role } from "@halo-dev/api-client";
 
 // components
-import {
-  IconAddCircle,
-  IconArrowDown,
-  IconShieldUser,
-  Dialog,
-  VButton,
-  VCard,
-  VPageHeader,
-  VSpace,
-  VTag,
-  VStatusDot,
-  VEntity,
-  VEntityField,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
 // constants

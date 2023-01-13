@@ -1,6 +1,4 @@
-<script lang="ts" setup>
-import { IconDeleteBin } from "@halo-dev/components";
-</script>
+<script lang="ts" setup></script>
 
 <template>
   <div
