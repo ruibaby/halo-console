@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 // core libs
-import { ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -15,9 +14,6 @@ import {
   convertTreeToCategories,
   resetCategoriesTreePriority,
 } from "./utils";
-
-// libs
-import { useDebounceFn } from "@vueuse/core";
 
 // hooks
 import { usePostCategory } from "./composables/use-post-category";

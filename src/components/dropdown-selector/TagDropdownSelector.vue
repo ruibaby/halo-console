@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { Tag } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
-import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";

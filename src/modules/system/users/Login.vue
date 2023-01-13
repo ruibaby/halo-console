@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { onBeforeMount } from "vue";
 import router from "@/router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { useUserStore } from "@/stores/user";

@@ -2,7 +2,6 @@
 import { VModal, Dialog } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
-import { computed, ref, watch } from "vue";
 import type { SuccessResponse } from "@uppy/core";
 
 const props = withDefaults(

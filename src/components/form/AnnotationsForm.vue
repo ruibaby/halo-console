@@ -6,7 +6,6 @@ import {
   type FormKitSchemaCondition,
   type FormKitSchemaNode,
 } from "@formkit/core";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";

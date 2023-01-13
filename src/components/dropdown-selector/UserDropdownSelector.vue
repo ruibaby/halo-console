@@ -2,7 +2,6 @@
 import type { User } from "@halo-dev/api-client";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import { setFocus } from "@/formkit/utils/focus";
-import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
 
 const props = withDefaults(

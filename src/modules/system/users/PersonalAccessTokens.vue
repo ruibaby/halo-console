@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 

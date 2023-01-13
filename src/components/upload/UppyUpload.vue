@@ -6,7 +6,6 @@ import Uppy, { type SuccessResponse } from "@uppy/core";
 import type { Restrictions } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
 import zh_CN from "@uppy/locales/lib/zh_CN";
-import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
 import type { ProblemDetail } from "@/utils/api-client";
 

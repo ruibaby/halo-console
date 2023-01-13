@@ -3,7 +3,6 @@ import { Dialog, Toast } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";

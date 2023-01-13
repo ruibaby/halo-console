@@ -89,15 +89,7 @@ import MdiFormatHeader3 from "~icons/mdi/format-header-3";
 import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import {
-  computed,
-  inject,
-  markRaw,
-  nextTick,
-  ref,
-  watch,
-  type ComputedRef,
-} from "vue";
+import type { ComputedRef } from "vue";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "@/modules/contents/attachments/composables/use-attachment";
 

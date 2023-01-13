@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-// core libs
-import { computed, inject, watch } from "vue";
-
 // types
 import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";

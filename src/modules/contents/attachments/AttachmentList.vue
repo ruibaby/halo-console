@@ -4,7 +4,6 @@ import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
-import { computed, onMounted, ref, watch } from "vue";
 import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";

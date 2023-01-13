@@ -14,7 +14,6 @@ import type {
 // @ts-ignore
 import { Picker } from "emoji-mart";
 import i18n from "@emoji-mart/data/i18n/zh.json";
-import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";

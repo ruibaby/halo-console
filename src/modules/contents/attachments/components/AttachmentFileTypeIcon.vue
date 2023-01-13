@@ -30,7 +30,6 @@ import VscodeIconsFileTypePython from "~icons/vscode-icons/file-type-python";
 import VscodeIconsFileTypeShell from "~icons/vscode-icons/file-type-shell";
 import VscodeIconsFileTypePhp3 from "~icons/vscode-icons/file-type-php3";
 import { extname } from "path-browserify";
-import { computed, markRaw } from "vue";
 
 const FileTypeIconsMap = {
   // image

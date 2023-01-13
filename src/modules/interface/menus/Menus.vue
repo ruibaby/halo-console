@@ -3,7 +3,6 @@ import { Dialog, Toast } from "@halo-dev/components";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
-import { onUnmounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -15,8 +14,6 @@ import {
   getChildrenNames,
   resetMenuItemsTreePriority,
 } from "./utils";
-import { useDebounceFn } from "@vueuse/core";
-import { onBeforeRouteLeave } from "vue-router";
 
 const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);

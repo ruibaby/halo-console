@@ -4,7 +4,6 @@ import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useThemeStore } from "@/stores/theme";
-import { storeToRefs } from "pinia";
 
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;

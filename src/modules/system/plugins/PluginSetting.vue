@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-// core libs
-import { computed, ref } from "vue";
-
 // hooks
 import { useSettingForm } from "@/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";

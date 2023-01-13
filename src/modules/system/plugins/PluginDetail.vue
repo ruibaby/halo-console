@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Ref } from "vue";
-import { computed, inject, ref, watchEffect } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin, Role } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";

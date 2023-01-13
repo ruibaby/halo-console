@@ -12,7 +12,6 @@ import {
   IconEye,
   IconCheckboxCircle,
 } from "@halo-dev/components";
-import { watchEffect, ref } from "vue";
 import { isImage } from "@/utils/image";
 import { useAttachmentControl } from "../../composables/use-attachment";
 import type { AttachmentLike } from "@halo-dev/console-shared";

@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-// core libs
-import { onMounted, ref } from "vue";
-
 // components
 import { IconGrid, IconList } from "@halo-dev/components";
 import TagEditingModal from "./components/TagEditingModal.vue";

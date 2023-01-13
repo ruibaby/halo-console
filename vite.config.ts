@@ -8,6 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
 import Components from "unplugin-vue-components/vite";
+import AutoImport from "unplugin-auto-import/vite";
 
 export const sharedPlugins = [
   Vue(),
@@ -45,6 +46,13 @@ export const sharedPlugins = [
         },
       },
     ],
+  }),
+  AutoImport({
+    dts: "src/auto-imports.d.ts",
+    imports: ["vue", "vue-router", "pinia", "@vueuse/core"],
+    eslintrc: {
+      enabled: true,
+    },
   }),
 ];
 

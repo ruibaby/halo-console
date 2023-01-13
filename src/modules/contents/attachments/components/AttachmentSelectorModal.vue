@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import { ref, markRaw, onMounted } from "vue";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 import type {
   AttachmentLike,

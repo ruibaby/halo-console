@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { inject, type Ref } from "vue";
+import type { Ref } from "vue";
 import type { DashboardStats } from "@halo-dev/api-client";
 
 const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");

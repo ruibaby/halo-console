@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { computed, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import {

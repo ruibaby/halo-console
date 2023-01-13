@@ -9,10 +9,10 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, onMounted, provide, ref, watch, type Ref } from "vue";
+import type { Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
-import { onBeforeRouteLeave, type RouteLocationRaw } from "vue-router";
+import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 

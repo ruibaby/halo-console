@@ -4,8 +4,6 @@ import { useSettingForm } from "@/composables/use-setting-form";
 import { useSystemStatesStore } from "@/stores/system-states";
 import { apiClient } from "@/utils/api-client";
 import { Toast } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import category from "./setup-data/category.json";
 import tag from "./setup-data/tag.json";
 import post from "./setup-data/post.json";

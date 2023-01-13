@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useRouter } from "vue-router";
 withDefaults(
   defineProps<{
     code: number | string;

@@ -1,4 +1,3 @@
-import { defineStore } from "pinia";
 import type { Role, UserPermission } from "@halo-dev/api-client";
 
 interface RoleStoreState {

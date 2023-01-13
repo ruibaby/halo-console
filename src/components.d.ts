@@ -43,6 +43,7 @@ declare module "@vue/runtime-core" {
     IconRefreshLine: typeof import("@halo-dev/components")["IconRefreshLine"];
     IconReplyLine: typeof import("@halo-dev/components")["IconReplyLine"];
     IconSave: typeof import("@halo-dev/components")["IconSave"];
+    IconSearch: typeof import("@halo-dev/components")["IconSearch"];
     IconSettings: typeof import("@halo-dev/components")["IconSettings"];
     IconShieldUser: typeof import("@halo-dev/components")["IconShieldUser"];
     IconStopCircle: typeof import("@halo-dev/components")["IconStopCircle"];

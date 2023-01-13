@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
 import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";

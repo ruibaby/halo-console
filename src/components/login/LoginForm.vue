@@ -4,7 +4,6 @@ import { useUserStore } from "@/stores/user";
 import { randomUUID } from "@/utils/id";
 import axios from "axios";
 import { Toast } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm } from "@formkit/core";
 

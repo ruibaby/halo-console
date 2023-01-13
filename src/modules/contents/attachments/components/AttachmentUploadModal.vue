@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VModal, IconAddCircle, VAlert } from "@halo-dev/components";
-import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import {
   useFetchAttachmentPolicy,
@@ -8,7 +6,6 @@ import {
 } from "../composables/use-attachment-policy";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import { useLocalStorage } from "@vueuse/core";
 
 const props = withDefaults(
   defineProps<{

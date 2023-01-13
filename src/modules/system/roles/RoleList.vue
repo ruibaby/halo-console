@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch } from "vue";
 import type { Role } from "@halo-dev/api-client";
 
 // components

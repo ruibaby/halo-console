@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { DashboardStats } from "@halo-dev/api-client";
-import { VCard, IconEye } from "@halo-dev/components";
-import { inject, type Ref } from "vue";
+import type { Ref } from "vue";
 
 const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
 </script>

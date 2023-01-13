@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
-import { computed, onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
-import { onBeforeRouteLeave } from "vue-router";
 import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();

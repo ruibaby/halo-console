@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-// core libs
-import { onMounted, ref, watch } from "vue";
-
 // components
 import { Dialog, Toast } from "@halo-dev/components";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";

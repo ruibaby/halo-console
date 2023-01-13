@@ -1,6 +1,5 @@
 import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
-import { defineStore } from "pinia";
 
 interface UserStoreState {
   currentUser?: User;

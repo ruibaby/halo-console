@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import {

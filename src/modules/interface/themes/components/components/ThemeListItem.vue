@@ -2,7 +2,6 @@
 import { Dialog, Toast } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 import { usePermission } from "@/utils/permission";
 

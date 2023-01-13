@@ -3,7 +3,6 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
 import type { FormKitOptionsList } from "@formkit/inputs";
 import type { User } from "@halo-dev/api-client";
-import { computed, ref } from "vue";
 import { useFetchRole } from "../../roles/composables/use-role";
 
 const props = withDefaults(
