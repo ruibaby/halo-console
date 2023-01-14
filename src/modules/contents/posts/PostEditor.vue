@@ -13,16 +13,26 @@ import {
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
-import type { ComputedRef } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  toRef,
+  type ComputedRef,
+} from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
+import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
 import {
   useEditorExtensionPoints,
   type EditorProvider,
 } from "@/composables/use-editor-extension-points";
+import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 
 const router = useRouter();

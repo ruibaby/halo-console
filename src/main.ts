@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import type { DirectiveBinding } from "vue";
+import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
@@ -10,6 +11,7 @@ import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
 // core modules
 import { coreModules } from "./modules";
+import { useScriptTag } from "@vueuse/core";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";

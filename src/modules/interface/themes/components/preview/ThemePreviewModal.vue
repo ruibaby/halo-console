@@ -6,6 +6,8 @@ import { apiClient } from "@/utils/api-client";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { SettingForm, Theme } from "@halo-dev/api-client";
 import { IconComputer, IconPhone, IconTablet } from "@halo-dev/components";
+import { storeToRefs } from "pinia";
+import { computed, markRaw, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{

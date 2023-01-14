@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 
 const { currentUserHasPermission } = usePermission();
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type {
   ListedSinglePageList,
   SinglePage,
@@ -8,6 +9,7 @@ import type {
 } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
+import { onBeforeRouteLeave, RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";

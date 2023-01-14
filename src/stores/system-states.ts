@@ -1,3 +1,4 @@
+import { defineStore } from "pinia";
 import { apiClient } from "@/utils/api-client";
 
 interface SystemState {

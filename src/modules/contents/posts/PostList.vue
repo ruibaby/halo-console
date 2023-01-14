@@ -2,6 +2,7 @@
 import { Dialog, Toast } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type {
   User,
   Category,
@@ -12,6 +13,7 @@ import type {
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 import { postLabels } from "@/constants/labels";
 import { getNode } from "@formkit/core";
 

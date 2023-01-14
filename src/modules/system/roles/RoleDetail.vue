@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useRoute } from "vue-router";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";

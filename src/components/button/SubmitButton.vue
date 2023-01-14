@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { useMagicKeys } from "@vueuse/core";
+import { computed, useAttrs, watchEffect } from "vue";
+
 const props = withDefaults(
   defineProps<{
     text?: string;

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 // core libs
+import { computed, nextTick, onMounted, provide, ref, watch } from "vue";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
 // libs

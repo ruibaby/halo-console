@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Theme } from "@halo-dev/api-client";
 import { VEntity, VEntityField, VTag, VButton } from "@halo-dev/components";
+import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 
 const props = withDefaults(

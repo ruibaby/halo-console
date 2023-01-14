@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 // core libs
+import { inject, ref } from "vue";
 import { useThemeLifeCycle } from "./composables/use-theme";
 
 // components

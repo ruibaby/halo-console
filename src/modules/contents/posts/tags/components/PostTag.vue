@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { Tag } from "@halo-dev/api-client";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 import Color from "colorjs.io";
 
 const props = withDefaults(

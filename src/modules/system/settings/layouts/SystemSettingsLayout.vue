@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+// core libs
+import { nextTick, onMounted } from "vue";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
 // types
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { useSettingForm } from "@/composables/use-setting-form";

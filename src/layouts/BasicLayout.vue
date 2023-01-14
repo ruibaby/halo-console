@@ -1,9 +1,24 @@
 <script lang="ts" setup>
-import { Dialog } from "@halo-dev/components";
+import {
+  IconMore,
+  IconSearch,
+  IconUserSettings,
+  VTag,
+  VAvatar,
+  VSpace,
+  VButton,
+  Dialog,
+} from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import type { RouteRecordRaw } from "vue-router";
+import {
+  RouterView,
+  useRoute,
+  useRouter,
+  type RouteRecordRaw,
+} from "vue-router";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";

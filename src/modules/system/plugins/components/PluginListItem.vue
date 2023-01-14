@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
+import { ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";

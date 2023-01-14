@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { RouteLocationRaw } from "vue-router";
+import { useRoute, useRouter, type RouteLocationRaw } from "vue-router";
 import {
   IconLink,
   IconBookRead,
@@ -9,7 +9,7 @@ import {
   IconPages,
   IconUserSettings,
 } from "@halo-dev/components";
-import type { Component } from "vue";
+import { computed, markRaw, ref, watch, type Component } from "vue";
 import Fuse from "fuse.js";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";

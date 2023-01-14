@@ -3,8 +3,10 @@ import { Toast } from "@halo-dev/components";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import ThemeListItem from "./components/ThemeListItem.vue";
+import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
+import { onBeforeRouteLeave } from "vue-router";
 
 const props = withDefaults(
   defineProps<{

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Category } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
+import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 

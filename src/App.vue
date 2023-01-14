@@ -1,5 +1,10 @@
 <script lang="ts" setup>
+import { RouterView, useRoute } from "vue-router";
+import { computed, watch } from "vue";
+import { useTitle } from "@vueuse/core";
+import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
+import { storeToRefs } from "pinia";
 
 const { configMap } = storeToRefs(useSystemConfigMapStore());
 

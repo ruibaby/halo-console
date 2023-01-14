@@ -11,7 +11,8 @@ import {
   VCard,
   IconUserLine,
 } from "@halo-dev/components";
-import type { Component } from "vue";
+import { markRaw, ref, type Component } from "vue";
+import { useRouter } from "vue-router";
 import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
 
 interface Action {

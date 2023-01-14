@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
+import { onMounted, ref, watch } from "vue";
 import type { ListedPostList, Post } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { getNode } from "@formkit/core";
 

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import type { Ref } from "vue";
+// core libs
+import { nextTick, onMounted, type Ref } from "vue";
+import { computed, provide, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
@@ -16,6 +19,7 @@ import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
 import type { SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
+import { storeToRefs } from "pinia";
 
 const { currentUserHasPermission } = usePermission();
 

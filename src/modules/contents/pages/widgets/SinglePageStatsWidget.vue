@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { singlePageLabels } from "@/constants/labels";
 

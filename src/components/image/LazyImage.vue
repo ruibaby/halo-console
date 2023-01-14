@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { onMounted, ref } from "vue";
+
 const props = withDefaults(
   defineProps<{
     src: string;

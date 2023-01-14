@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { VModal } from "@halo-dev/components";
+import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 const props = withDefaults(

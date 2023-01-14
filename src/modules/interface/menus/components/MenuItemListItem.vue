@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import Draggable from "vuedraggable";
+import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
 import { usePermission } from "@/utils/permission";
 
