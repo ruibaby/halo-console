@@ -9,6 +9,7 @@ import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
 import Components from "unplugin-vue-components/vite";
 import AutoImport from "unplugin-auto-import/vite";
+import Inspect from "vite-plugin-inspect";
 
 export const sharedPlugins = [
   Vue(),
@@ -54,6 +55,7 @@ export const sharedPlugins = [
       enabled: true,
     },
   }),
+  Inspect(),
 ];
 
 export default ({ mode }: { mode: string }) => {

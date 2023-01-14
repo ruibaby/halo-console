@@ -93,6 +93,7 @@ importers:
       vite-compression-plugin: ^0.0.4
       vite-plugin-externals: ^0.5.1
       vite-plugin-html: ^3.2.0
+      vite-plugin-inspect: ^0.7.14
       vite-plugin-pwa: ^0.13.3
       vite-plugin-static-copy: ^0.11.1
       vitest: ^0.25.3
@@ -196,6 +197,7 @@ importers:
       vite-compression-plugin: 0.0.4
       vite-plugin-externals: 0.5.1_vite@4.0.4
       vite-plugin-html: 3.2.0_vite@4.0.4
+      vite-plugin-inspect: 0.7.14_vite@4.0.4
       vite-plugin-pwa: 0.13.3_vite@4.0.4
       vite-plugin-static-copy: 0.11.1_vite@4.0.4
       vitest: 0.25.3_wqgykbafw5ps5nhnqfbxcvabhu
@@ -6236,6 +6238,15 @@ packages:
       universalify: 2.0.0
     dev: true
 
+  /fs-extra/11.1.0:
+    resolution: {integrity: sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==}
+    engines: {node: '>=14.14'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -9804,6 +9815,25 @@ packages:
       node-html-parser: 5.4.2
       pathe: 0.2.0
       vite: 4.0.4_ajklay5k626t46b6fyghkbup3i
+    dev: true
+
+  /vite-plugin-inspect/0.7.14_vite@4.0.4:
+    resolution: {integrity: sha512-C9V93Yy2yUf941oVxIq93K6T1o0SZxoG8MdmyJsnoNDijOAGHT1rVSVjzF/uKFYvgnvLvaXioaoy6ica6aOS0g==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      vite: ^3.1.0 || ^4.0.0
+    dependencies:
+      '@antfu/utils': 0.7.2
+      '@rollup/pluginutils': 5.0.2
+      debug: 4.3.4
+      fs-extra: 11.1.0
+      kolorist: 1.6.0
+      sirv: 2.0.2
+      ufo: 1.0.1
+      vite: 4.0.4_ajklay5k626t46b6fyghkbup3i
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
     dev: true
 
   /vite-plugin-pwa/0.13.3_vite@4.0.4:

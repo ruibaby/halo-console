@@ -80,15 +80,18 @@ export const setupLibraryExternal = (
   console.log(injectScript);
 
   return [
-    ViteExternals({
-      vue: "Vue",
-      "vue-router": "VueRouter",
-      "@halo-dev/shared": "HaloConsoleShared",
-      "@halo-dev/components": "HaloComponents",
-      "@vueuse/core": "VueUse",
-      "@vueuse/components": "VueUse",
-      "@vueuse/router": "VueUse",
-    }),
+    {
+      ...ViteExternals({
+        vue: "Vue",
+        "vue-router": "VueRouter",
+        "@halo-dev/shared": "HaloConsoleShared",
+        "@halo-dev/components": "HaloComponents",
+        "@vueuse/core": "VueUse",
+        "@vueuse/components": "VueUse",
+        "@vueuse/router": "VueUse",
+      }),
+      enforce: "post",
+    },
     ViteStaticCopy({
       targets: staticTargets,
     }),
