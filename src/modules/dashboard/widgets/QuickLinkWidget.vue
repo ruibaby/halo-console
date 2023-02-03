@@ -43,6 +43,7 @@ const actions: Action[] = [
     action: () => {
       themePreviewVisible.value = true;
     },
+    permissions: ["system:themes:view"],
   },
   {
     icon: markRaw(IconBookRead),

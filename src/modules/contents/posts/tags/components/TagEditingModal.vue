@@ -14,6 +14,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import useSlugify from "@/composables/use-slugify";
 
 const props = withDefaults(
   defineProps<{
@@ -131,6 +132,20 @@ watch(
     }
   }
 );
+
+// slug
+const { handleGenerateSlug } = useSlugify(
+  computed(() => formState.value.spec.displayName),
+  computed({
+    get() {
+      return formState.value.spec.slug;
+    },
+    set(value) {
+      formState.value.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value)
+);
 </script>
 <template>
   <VModal
@@ -173,12 +188,24 @@ watch(
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
-              help="通常作为标签访问地址标识"
+              help="通常用于生成标签的固定链接"
               label="别名"
               name="slug"
               type="text"
               validation="required|length:0,50"
-            ></FormKit>
+            >
+              <template #suffix>
+                <div
+                  v-tooltip="'根据名称重新生成别名'"
+                  class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
+                  @click="handleGenerateSlug"
+                >
+                  <IconRefreshLine
+                    class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+                  />
+                </div>
+              </template>
+            </FormKit>
             <FormKit
               v-model="formState.spec.color"
               name="color"

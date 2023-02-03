@@ -26,8 +26,12 @@ const emit = defineEmits<{
 
 const { theme } = toRefs(props);
 
-const { isActivated, handleActiveTheme, handleResetSettingConfig } =
-  useThemeLifeCycle(theme);
+const {
+  isActivated,
+  getFailedMessage,
+  handleActiveTheme,
+  handleResetSettingConfig,
+} = useThemeLifeCycle(theme);
 
 const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   Dialog.warning({
@@ -125,6 +129,11 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       </VEntityField>
     </template>
     <template #end>
+      <VEntityField v-if="getFailedMessage()">
+        <template #description>
+          <VStatusDot v-tooltip="getFailedMessage()" state="warning" animate />
+        </template>
+      </VEntityField>
       <VEntityField v-if="theme.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />

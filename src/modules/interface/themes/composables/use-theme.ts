@@ -9,6 +9,7 @@ import { storeToRefs } from "pinia";
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
   isActivated: ComputedRef<boolean>;
+  getFailedMessage: () => string | undefined;
   handleActiveTheme: () => void;
   handleResetSettingConfig: () => void;
 }
@@ -26,29 +27,29 @@ export function useThemeLifeCycle(
     return activatedTheme?.value?.metadata.name === theme.value?.metadata.name;
   });
 
+  const getFailedMessage = (): string | undefined => {
+    if (!(theme.value?.status?.phase === "FAILED")) {
+      return;
+    }
+
+    const condition = theme.value.status.conditions?.[0];
+
+    if (condition) {
+      return [condition.type, condition.message].join("：");
+    }
+  };
+
   const handleActiveTheme = async () => {
     Dialog.info({
       title: "是否确认启用当前主题",
       description: theme.value?.spec.displayName,
       onConfirm: async () => {
         try {
-          const { data: systemConfigMap } =
-            await apiClient.extension.configMap.getv1alpha1ConfigMap({
-              name: "system",
-            });
+          if (!theme.value) return;
 
-          if (systemConfigMap.data) {
-            const themeConfigToUpdate = JSON.parse(
-              systemConfigMap.data?.theme || "{}"
-            );
-            themeConfigToUpdate.active = theme.value?.metadata.name;
-            systemConfigMap.data["theme"] = JSON.stringify(themeConfigToUpdate);
-
-            await apiClient.extension.configMap.updatev1alpha1ConfigMap({
-              name: "system",
-              configMap: systemConfigMap,
-            });
-          }
+          await apiClient.theme.activateTheme({
+            name: theme.value?.metadata.name,
+          });
 
           Toast.success("启用成功");
         } catch (e) {
@@ -86,6 +87,7 @@ export function useThemeLifeCycle(
   return {
     loading,
     isActivated,
+    getFailedMessage,
     handleActiveTheme,
     handleResetSettingConfig,
   };
