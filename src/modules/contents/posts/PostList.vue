@@ -768,7 +768,7 @@ const hasFilters = computed(() => {
                     name: 'PostEditor',
                     query: { name: post.post.metadata.name },
                   }"
-                  width="27rem"
+                  class="sm:w-[27rem]"
                 >
                   <template #extra>
                     <VSpace class="mt-1 sm:mt-0">
