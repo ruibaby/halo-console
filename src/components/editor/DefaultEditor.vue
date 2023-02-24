@@ -301,6 +301,12 @@ const editor = useEditor({
       return false;
     },
     handlePaste: (view, event: ClipboardEvent) => {
+      const types = Array.from(event.clipboardData?.types || []);
+
+      if (["text/plain", "text/html"].includes(types[0])) {
+        return;
+      }
+
       const images = Array.from(event.clipboardData?.items || [])
         .map((item) => {
           return item.getAsFile();
@@ -339,7 +345,7 @@ const editor = useEditor({
 });
 
 // image drag and paste upload
-const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
+const { policies } = useFetchAttachmentPolicy();
 
 type Task = {
   file: File;
@@ -349,7 +355,7 @@ type Task = {
 const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
 
 async function asyncWorker(arg: Task): Promise<void> {
-  if (!policies.value.length) {
+  if (!policies.value?.length) {
     Toast.warning("目前没有可用的存储策略");
     return;
   }
@@ -532,7 +538,7 @@ watch(
         <VTabs v-model:active-id="extraActiveId" type="outline">
           <VTabItem id="toc" label="大纲">
             <div class="p-1 pt-0">
-              <ul class="space-y-1">
+              <ul v-if="headingNodes?.length" class="space-y-1">
                 <li
                   v-for="(node, index) in headingNodes"
                   :key="index"
@@ -559,6 +565,9 @@ watch(
                   </div>
                 </li>
               </ul>
+              <div v-else class="flex flex-col items-center py-10">
+                <span class="text-sm text-gray-600">暂无大纲</span>
+              </div>
             </div>
           </VTabItem>
           <VTabItem id="information" label="详情">

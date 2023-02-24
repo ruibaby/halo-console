@@ -56,7 +56,7 @@ const handleDelete = async () => {
 
         Toast.success("删除成功");
       } catch (error) {
-        console.log("Failed to delete comment", error);
+        console.error("Failed to delete comment", error);
       } finally {
         emit("reload");
       }
@@ -295,10 +295,10 @@ const subjectRefResult = computed(() => {
         :title="comment?.owner?.displayName"
         :description="comment?.owner?.email"
       ></VEntityField>
-      <VEntityField>
+      <VEntityField width="60%">
         <template #description>
           <div class="flex flex-col gap-2">
-            <div class="text-sm text-gray-900">
+            <div class="break-all text-sm text-gray-900">
               {{ comment?.comment?.spec.content }}
             </div>
             <div class="flex items-center gap-3 text-xs">
@@ -356,10 +356,15 @@ const subjectRefResult = computed(() => {
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />
         </template>
       </VEntityField>
-      <VEntityField v-if="comment?.comment?.spec.approvedTime">
+      <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(comment?.comment?.spec.approvedTime) }}
+            {{
+              formatDatetime(
+                comment?.comment.spec.creationTime ||
+                  comment?.comment.metadata.creationTimestamp
+              )
+            }}
           </span>
         </template>
       </VEntityField>

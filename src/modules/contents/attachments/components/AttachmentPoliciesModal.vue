@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../composables/use-attachment-policy";
 import { apiClient } from "@/utils/api-client";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     visible: boolean;
   }>(),
@@ -24,11 +24,8 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { policies, loading, handleFetchPolicies } = useFetchAttachmentPolicy();
-const { policyTemplates, handleFetchPolicyTemplates } =
-  useFetchAttachmentPolicyTemplate({
-    fetchOnMounted: false,
-  });
+const { policies, isLoading, handleFetchPolicies } = useFetchAttachmentPolicy();
+const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
 const selectedPolicy = ref<Policy>();
 
@@ -94,16 +91,6 @@ const onEditingModalClose = () => {
   selectedPolicy.value = undefined;
   handleFetchPolicies();
 };
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      handleFetchPolicyTemplates();
-      handleFetchPolicies();
-    }
-  }
-);
 </script>
 <template>
   <VModal
@@ -111,6 +98,7 @@ watch(
     :width="750"
     title="存储策略"
     :body-class="['!p-0']"
+    :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <template #actions>
@@ -138,7 +126,7 @@ watch(
       </FloatingDropdown>
     </template>
     <VEmpty
-      v-if="!policies.length && !loading"
+      v-if="!policies?.length && !isLoading"
       message="当前没有可用的存储策略，你可以尝试刷新或者新建策略"
       title="当前没有可用的存储策略"
     >

@@ -30,6 +30,7 @@ const onVisibleChange = (visible: boolean) => {
     :visible="visible"
     fullscreen
     :title="title"
+    :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <template #actions>

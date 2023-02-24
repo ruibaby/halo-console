@@ -51,6 +51,7 @@ const selectedIndex = ref(0);
 const fuse = new Fuse(searchableItem, {
   keys: ["title", "group", "route.path", "route.name"],
   useExtendedSearch: true,
+  threshold: 0.2,
 });
 
 const searchResults = computed((): SearchableItem[] => {
@@ -368,6 +369,7 @@ const onVisibleChange = (visible: boolean) => {
     :mount-to-body="true"
     :width="650"
     :centered="false"
+    :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <div id="search-input" class="border-b border-gray-100 px-4 py-2.5">

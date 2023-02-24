@@ -1,84 +1,54 @@
 <script lang="ts" setup>
 import { Dialog, Toast } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
-import { onMounted, ref, watch } from "vue";
-import type { ListedPostList, Post } from "@halo-dev/api-client";
+import { ref, watch } from "vue";
+import type { ListedPost, Post } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import { onBeforeRouteLeave } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { getNode } from "@formkit/core";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
-const posts = ref<ListedPostList>({
-  page: 1,
-  size: 50,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
-const refreshInterval = ref();
 const keyword = ref("");
 
-const handleFetchPosts = async (page?: number) => {
-  try {
-    clearInterval(refreshInterval.value);
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
 
-    loading.value = true;
-
-    if (page) {
-      posts.value.page = page;
-    }
-
+const {
+  data: posts,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedPost[]>({
+  queryKey: ["deleted-posts", page, size, keyword],
+  queryFn: async () => {
     const { data } = await apiClient.post.listPosts({
       labelSelector: [`content.halo.run/deleted=true`],
-      page: posts.value.page,
-      size: posts.value.size,
+      page: page.value,
+      size: size.value,
       keyword: keyword.value,
     });
-    posts.value = data;
 
-    const deletedPosts = posts.value.items.filter(
+    total.value = data.total;
+
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval: (data) => {
+    const deletingPosts = data?.filter(
       (post) =>
         !!post.post.metadata.deletionTimestamp || !post.post.spec.deleted
     );
-
-    if (deletedPosts.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchPosts();
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch deleted posts", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
+    return deletingPosts?.length ? 3000 : false;
+  },
 });
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  posts.value.page = page;
-  posts.value.size = size;
-  handleFetchPosts();
-};
 
 const checkSelection = (post: Post) => {
   return selectedPostNames.value.includes(post.metadata.name);
@@ -89,7 +59,7 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedPostNames.value =
-      posts.value.items.map((post) => {
+      posts.value?.map((post) => {
         return post.post.metadata.name;
       }) || [];
   } else {
@@ -106,7 +76,7 @@ const handleDeletePermanently = async (post: Post) => {
       await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
         name: post.metadata.name,
       });
-      await handleFetchPosts();
+      await refetch();
 
       Toast.success("删除成功");
     },
@@ -126,7 +96,7 @@ const handleDeletePermanentlyInBatch = async () => {
           });
         })
       );
-      await handleFetchPosts();
+      await refetch();
       selectedPostNames.value = [];
 
       Toast.success("删除成功");
@@ -145,7 +115,8 @@ const handleRecovery = async (post: Post) => {
         name: postToUpdate.metadata.name,
         post: postToUpdate,
       });
-      await handleFetchPosts();
+
+      await refetch();
 
       Toast.success("恢复成功");
     },
@@ -159,7 +130,7 @@ const handleRecoveryInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
-          const post = posts.value.items.find(
+          const post = posts.value?.find(
             (item) => item.post.metadata.name === name
           )?.post;
 
@@ -167,14 +138,19 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          post.spec.deleted = false;
           return apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
             name: post.metadata.name,
-            post: post,
+            post: {
+              ...post,
+              spec: {
+                ...post.spec,
+                deleted: false,
+              },
+            },
           });
         })
       );
-      await handleFetchPosts();
+      await refetch();
       selectedPostNames.value = [];
 
       Toast.success("恢复成功");
@@ -183,11 +159,7 @@ const handleRecoveryInBatch = async () => {
 };
 
 watch(selectedPostNames, (newValue) => {
-  checkedAll.value = newValue.length === posts.value.items?.length;
-});
-
-onMounted(() => {
-  handleFetchPosts();
+  checkedAll.value = newValue.length === posts.value?.length;
 });
 
 function handleKeywordChange() {
@@ -195,12 +167,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchPosts(1);
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchPosts(1);
+  page.value = 1;
 }
 </script>
 <template>
@@ -276,10 +248,10 @@ function handleClearKeyword() {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPosts()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -290,16 +262,16 @@ function handleClearKeyword() {
         </div>
       </template>
 
-      <VLoading v-if="loading" />
+      <VLoading v-if="isLoading" />
 
-      <Transition v-else-if="!posts.items.length" appear name="fade">
+      <Transition v-else-if="!posts?.length" appear name="fade">
         <VEmpty
           message="你可以尝试刷新或者返回文章管理"
           title="没有文章被放入回收站"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchPosts">刷新</VButton>
+              <VButton @click="refetch">刷新</VButton>
               <VButton :route="{ name: 'Posts' }" type="primary">
                 返回
               </VButton>
@@ -313,7 +285,7 @@ function handleClearKeyword() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(post, index) in posts.items" :key="index">
+          <li v-for="(post, index) in posts" :key="index">
             <VEntity :is-selected="checkSelection(post.post)">
               <template
                 v-if="currentUserHasPermission(['system:posts:manage'])"
@@ -329,37 +301,37 @@ function handleClearKeyword() {
               </template>
               <template #start>
                 <VEntityField :title="post.post.spec.title" width="27rem">
-                  <template #extra>
-                    <VSpace class="mt-1 sm:mt-0">
-                      <PostTag
-                        v-for="(tag, tagIndex) in post.tags"
-                        :key="tagIndex"
-                        :tag="tag"
-                        route
-                      ></PostTag>
-                    </VSpace>
-                  </template>
                   <template #description>
-                    <VSpace class="flex-wrap !gap-y-1">
-                      <p
-                        v-if="post.categories.length"
-                        class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
-                      >
-                        分类：<span
-                          v-for="(category, categoryIndex) in post.categories"
-                          :key="categoryIndex"
-                          class="cursor-pointer hover:text-gray-900"
+                    <div class="flex flex-col gap-1.5">
+                      <VSpace class="flex-wrap !gap-y-1">
+                        <p
+                          v-if="post.categories.length"
+                          class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          {{ category.spec.displayName }}
+                          分类：<span
+                            v-for="(category, categoryIndex) in post.categories"
+                            :key="categoryIndex"
+                            class="cursor-pointer hover:text-gray-900"
+                          >
+                            {{ category.spec.displayName }}
+                          </span>
+                        </p>
+                        <span class="text-xs text-gray-500">
+                          访问量 {{ post.stats.visit || 0 }}
                         </span>
-                      </p>
-                      <span class="text-xs text-gray-500">
-                        访问量 {{ post.stats.visit || 0 }}
-                      </span>
-                      <span class="text-xs text-gray-500">
-                        评论 {{ post.stats.totalComment || 0 }}
-                      </span>
-                    </VSpace>
+                        <span class="text-xs text-gray-500">
+                          评论 {{ post.stats.totalComment || 0 }}
+                        </span>
+                      </VSpace>
+                      <VSpace v-if="post.tags.length" class="flex-wrap">
+                        <PostTag
+                          v-for="(tag, tagIndex) in post.tags"
+                          :key="tagIndex"
+                          :tag="tag"
+                          route
+                        ></PostTag>
+                      </VSpace>
+                    </div>
                   </template>
                 </VEntityField>
               </template>
@@ -434,11 +406,10 @@ function handleClearKeyword() {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="posts.page"
-            :size="posts.size"
-            :total="posts.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>

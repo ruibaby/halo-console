@@ -1,18 +1,12 @@
 import { defineStore } from "pinia";
-import type { Role, UserPermission } from "@halo-dev/api-client";
+import type { UserPermission } from "@halo-dev/api-client";
+import { ref } from "vue";
 
-interface RoleStoreState {
-  roles: Role[]; // all roles
-  permissions: UserPermission; // current user's permissions
-}
-
-export const useRoleStore = defineStore({
-  id: "role",
-  state: (): RoleStoreState => ({
+export const useRoleStore = defineStore("role", () => {
+  const permissions = ref<UserPermission>({
     roles: [],
-    permissions: {
-      roles: [],
-      uiPermissions: [],
-    },
-  }),
+    uiPermissions: [],
+  });
+
+  return { permissions };
 });

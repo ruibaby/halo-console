@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import type { Ref } from "vue";
-import { computed, inject, ref, watchEffect } from "vue";
+import { computed, inject } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin, Role } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "./composables/use-plugin";
 import { formatDatetime } from "@/utils/date";
+import { useQuery } from "@tanstack/vue-query";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
@@ -16,24 +17,22 @@ interface RoleTemplateGroup {
   roles: Role[];
 }
 
-const pluginRoleTemplates = ref<Role[]>([]);
-
-const handleFetchRoles = async () => {
-  try {
+const { data: pluginRoleTemplates } = useQuery({
+  queryKey: ["plugin-roles", plugin?.value?.metadata.name],
+  queryFn: async () => {
     const { data } = await apiClient.extension.role.listv1alpha1Role({
       page: 0,
       size: 0,
       labelSelector: [`${pluginLabels.NAME}=${plugin?.value?.metadata.name}`],
     });
-    pluginRoleTemplates.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
+
+    return data.items;
+  },
+});
 
 const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   const groups: RoleTemplateGroup[] = [];
-  pluginRoleTemplates.value.forEach((role) => {
+  pluginRoleTemplates.value?.forEach((role) => {
     const group = groups.find(
       (group) =>
         group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
@@ -48,12 +47,6 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
     }
   });
   return groups;
-});
-
-watchEffect(() => {
-  if (plugin?.value) {
-    handleFetchRoles();
-  }
 });
 </script>
 

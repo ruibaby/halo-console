@@ -54,7 +54,7 @@ const handleGrantPermission = async () => {
     });
     onVisibleChange(false);
   } catch (error) {
-    console.log("Failed to grant permission to user", error);
+    console.error("Failed to grant permission to user", error);
   } finally {
     saving.value = false;
   }

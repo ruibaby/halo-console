@@ -50,6 +50,7 @@ watch(
     fuse = new Fuse(users.value, {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
+      threshold: 0.2,
     });
   }
 );
@@ -94,6 +95,7 @@ const searchResults = computed(() => {
                   <VEntityField>
                     <template #description>
                       <VAvatar
+                        :key="user.metadata.name"
                         :alt="user.spec.displayName"
                         :src="user.spec.avatar"
                         size="md"

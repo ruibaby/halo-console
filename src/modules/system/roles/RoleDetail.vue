@@ -238,7 +238,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">
                 <div>
-                  {{ group.module }}
+                  {{ $t(`rbac.${group.module}`, group.module as string) }}
                 </div>
                 <div
                   v-if="
@@ -289,9 +289,16 @@ onMounted(() => {
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
                           {{
-                            role.metadata.annotations?.[
-                              rbacAnnotations.DISPLAY_NAME
-                            ]
+                            $t(
+                              `rbac.${
+                                role.metadata.annotations?.[
+                                  rbacAnnotations.DISPLAY_NAME
+                                ]
+                              }`,
+                              role.metadata.annotations?.[
+                                rbacAnnotations.DISPLAY_NAME
+                              ] as string
+                            )
                           }}
                         </span>
                         <span
@@ -308,7 +315,11 @@ onMounted(() => {
                               role.metadata.annotations?.[
                                 rbacAnnotations.DEPENDENCIES
                               ]
-                            ).join(", ")
+                            )
+                              .map((item: string) =>
+                                $t(`rbac.${item}`, item as string)
+                              )
+                              .join("，")
                           }}
                         </span>
                       </div>

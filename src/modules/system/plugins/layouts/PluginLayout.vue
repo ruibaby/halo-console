@@ -63,7 +63,7 @@ const handleFetchPlugin = async () => {
 };
 
 const handleFetchSettings = async () => {
-  if (!plugin.value) return;
+  if (!plugin.value || !plugin.value.spec.settingName) return;
   const { data } = await apiClient.plugin.fetchPluginSetting({
     name: plugin.value?.metadata.name,
   });
@@ -105,9 +105,7 @@ onMounted(async () => {
     return;
   }
 
-  if (isStarted.value) {
-    await handleFetchSettings();
-  }
+  await handleFetchSettings();
 
   tabs.value = cloneDeep(initialTabs);
 
@@ -164,19 +162,19 @@ watch([() => route.name, () => route.params], () => {
             @change="handleTabChange"
           ></VTabbar>
         </template>
+        <div class="bg-white">
+          <RouterView :key="activeTab" v-slot="{ Component }">
+            <template v-if="Component">
+              <Suspense>
+                <component :is="Component"></component>
+                <template #fallback>
+                  <VLoading />
+                </template>
+              </Suspense>
+            </template>
+          </RouterView>
+        </div>
       </VCard>
-      <div class="bg-white">
-        <RouterView :key="activeTab" v-slot="{ Component }">
-          <template v-if="Component">
-            <Suspense>
-              <component :is="Component"></component>
-              <template #fallback>
-                <VLoading />
-              </template>
-            </Suspense>
-          </template>
-        </RouterView>
-      </div>
     </div>
   </BasicLayout>
 </template>

@@ -64,7 +64,7 @@ const handleFetchComments = async (options?: {
       }, 3000);
     }
   } catch (error) {
-    console.log("Failed to fetch comments", error);
+    console.error("Failed to fetch comments", error);
   } finally {
     loading.value = false;
   }

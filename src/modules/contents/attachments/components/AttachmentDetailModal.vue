@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTag } from "@halo-dev/components";
-import type { Attachment, Policy } from "@halo-dev/api-client";
+import type { Attachment } from "@halo-dev/api-client";
+import LazyImage from "@/components/image/LazyImage.vue";
 import prettyBytes from "pretty-bytes";
-import { ref, watch, watchEffect } from "vue";
+import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
+import { useQuery } from "@tanstack/vue-query";
 
 const props = withDefaults(
   defineProps<{
@@ -26,43 +28,40 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { groups, handleFetchGroups } = useFetchAttachmentGroup();
+const { groups } = useFetchAttachmentGroup();
 
-const policy = ref<Policy>();
 const onlyPreview = ref(false);
 
-watchEffect(async () => {
-  if (props.attachment) {
-    const { policyName } = props.attachment.spec;
-    if (!policyName) {
-      return;
-    }
-    const { data } =
-      await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy({
-        name: policyName,
-      });
-    policy.value = data;
-  }
+const policyName = computed(() => {
+  return props.attachment?.spec.policyName;
 });
 
-watch(
-  () => props.visible,
-  (newValue) => {
-    if (newValue) {
-      handleFetchGroups();
+const { data: policy } = useQuery({
+  queryKey: ["attachment-policy", policyName],
+  queryFn: async () => {
+    if (!policyName.value) {
+      return;
     }
-  }
-);
+
+    const { data } =
+      await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy({
+        name: policyName.value,
+      });
+
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => !!policyName.value),
+});
 
 const getGroupName = (name: string | undefined) => {
-  const group = groups.value.find((group) => group.metadata.name === name);
+  const group = groups.value?.find((group) => group.metadata.name === name);
   return group?.spec.displayName || name;
 };
 
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
-    policy.value = undefined;
     onlyPreview.value = false;
     emit("close");
   }
@@ -74,6 +73,7 @@ const onVisibleChange = (visible: boolean) => {
     :visible="visible"
     :width="1000"
     :mount-to-body="mountToBody"
+    :layer-closable="true"
     height="calc(100vh - 20px)"
     @update:visible="onVisibleChange"
   >
@@ -115,6 +115,20 @@ const onVisibleChange = (visible: boolean) => {
                   <span class="text-red-400">加载异常</span>
                 </template>
               </LazyImage>
+            </div>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
+              <video
+                :src="attachment.status?.permalink"
+                controls
+                class="max-w-full rounded sm:max-w-[50%]"
+              >
+                当前浏览器不支持该视频播放
+              </video>
+            </div>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('audio/')">
+              <audio :src="attachment.status?.permalink" controls>
+                当前浏览器不支持该音频播放
+              </audio>
             </div>
             <span v-else> 此文件不支持预览 </span>
           </dd>

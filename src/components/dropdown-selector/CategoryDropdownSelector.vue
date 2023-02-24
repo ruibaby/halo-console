@@ -19,9 +19,7 @@ const emit = defineEmits<{
   (event: "select", category?: Category): void;
 }>();
 
-const { categories, handleFetchCategories } = usePostCategory({
-  fetchOnMounted: false,
-});
+const { categories } = usePostCategory();
 
 const handleSelect = (category: Category) => {
   if (
@@ -38,7 +36,6 @@ const handleSelect = (category: Category) => {
 };
 
 function onDropdownShow() {
-  handleFetchCategories();
   setTimeout(() => {
     setFocus("categoryDropdownSelectorInput");
   }, 200);
@@ -52,10 +49,14 @@ let fuse: Fuse<Category> | undefined = undefined;
 watch(
   () => categories.value,
   () => {
-    fuse = new Fuse(categories.value, {
+    fuse = new Fuse(categories.value || [], {
       keys: ["spec.displayName", "metadata.name"],
       useExtendedSearch: true,
+      threshold: 0.2,
     });
+  },
+  {
+    immediate: true,
   }
 );
 
